@@ -1,0 +1,130 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE campaigns\n        SET cost_per_click = COALESCE($1, cost_per_click),\n            ad_title = COALESCE($2, ad_title),\n            ad_text = COALESCE($3, ad_text),\n            gender = COALESCE($4, gender),\n            age_from = COALESCE($5, age_from),\n            age_to = COALESCE($6, age_to),\n            location = COALESCE($7, location)\n        WHERE advertiser_id = $8 AND id = $9\n        RETURNING id, advertiser_id, impressions_limit, clicks_limit, cost_per_impression,\n                  cost_per_click, ad_title, ad_text, start_date, end_date,\n                  gender AS \"gender: GenderModel\",\n                  age_from, age_to, location\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "advertiser_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "impressions_limit",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "clicks_limit",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "cost_per_impression",
+        "type_info": "Float8"
+      },
+      {
+        "ordinal": 5,
+        "name": "cost_per_click",
+        "type_info": "Float8"
+      },
+      {
+        "ordinal": 6,
+        "name": "ad_title",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "ad_text",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "start_date",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 9,
+        "name": "end_date",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 10,
+        "name": "gender: GenderModel",
+        "type_info": {
+          "Custom": {
+            "name": "campaign_gender",
+            "kind": {
+              "Enum": [
+                "MALE",
+                "FEMALE",
+                "ALL"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 11,
+        "name": "age_from",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 12,
+        "name": "age_to",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 13,
+        "name": "location",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Float8",
+        "Text",
+        "Text",
+        {
+          "Custom": {
+            "name": "campaign_gender",
+            "kind": {
+              "Enum": [
+                "MALE",
+                "FEMALE",
+                "ALL"
+              ]
+            }
+          }
+        },
+        "Int4",
+        "Int4",
+        "Text",
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "ee516c6dd499b7277dcff541945ff08e937c6f0c4837616d9619e5c4ed30ca48"
+}

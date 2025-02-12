@@ -1,0 +1,111 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT id, advertiser_id, impressions_limit, clicks_limit, cost_per_impression,\n               cost_per_click, ad_title, ad_text, start_date, end_date,\n               gender as \"gender: GenderModel\", age_from, age_to, location\n        FROM campaigns\n        WHERE advertiser_id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "advertiser_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "impressions_limit",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "clicks_limit",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "cost_per_impression",
+        "type_info": "Float8"
+      },
+      {
+        "ordinal": 5,
+        "name": "cost_per_click",
+        "type_info": "Float8"
+      },
+      {
+        "ordinal": 6,
+        "name": "ad_title",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "ad_text",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "start_date",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 9,
+        "name": "end_date",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 10,
+        "name": "gender: GenderModel",
+        "type_info": {
+          "Custom": {
+            "name": "campaign_gender",
+            "kind": {
+              "Enum": [
+                "MALE",
+                "FEMALE",
+                "ALL"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 11,
+        "name": "age_from",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 12,
+        "name": "age_to",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 13,
+        "name": "location",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "29584cee057abe727d75bd16a103e4d5dee544f012676afba2116e7d3670614d"
+}
