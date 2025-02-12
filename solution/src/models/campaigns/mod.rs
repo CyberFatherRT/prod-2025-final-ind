@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::prelude::{FromRow, Type};
 use uuid::Uuid;
 
-#[derive(Debug, Serialize, Deserialize, Type)]
+#[derive(Debug, Serialize, Deserialize, Type, Clone)]
 #[sqlx(type_name = "CAMPAIGN_GENDER", rename_all = "UPPERCASE")]
 #[serde(rename_all = "UPPERCASE")]
 pub enum GenderModel {
@@ -35,7 +35,7 @@ pub struct CampaignModel {
     pub targeting: TargetModel,
 }
 
-#[derive(Debug, FromRow)]
+#[derive(Clone, Debug, FromRow)]
 pub struct CampaignRow {
     pub id: Uuid,
     pub advertiser_id: Uuid,

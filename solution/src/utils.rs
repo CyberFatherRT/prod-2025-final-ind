@@ -31,3 +31,21 @@ pub async fn log_request(
 
     Ok(res)
 }
+
+pub fn paginate<T: Clone>(items: Vec<T>, size: Option<usize>, page: Option<usize>) -> Vec<T> {
+    let total_items = items.len();
+    let size = size.unwrap_or(total_items);
+    let page = page.unwrap_or(1);
+
+    if page == 0 {
+        return Vec::new();
+    }
+
+    let start = (page - 1) * size;
+
+    if start >= total_items {
+        return Vec::new();
+    }
+
+    items.into_iter().skip(start).take(size).collect()
+}
