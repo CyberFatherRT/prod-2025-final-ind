@@ -13,6 +13,7 @@ use utils::{env, log_request};
 mod controllers;
 mod db;
 mod errors;
+mod forms;
 mod macros;
 mod models;
 mod utils;
@@ -41,10 +42,10 @@ async fn main() -> anyhow::Result<()> {
     let app_state = AppState { pool };
 
     let api = Router::new()
-        .nest("/clients", clients::get_routes())
-        .nest("/advertisers", advertisers::get_routes())
         .route("/health", get(StatusCode::OK))
         .route("/ml-scores", post(advertisers::ml_scores))
+        .nest("/clients", clients::get_routes())
+        .nest("/advertisers", advertisers::get_routes())
         .layer(from_fn(log_request))
         .with_state(app_state);
 

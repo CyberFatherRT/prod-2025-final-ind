@@ -4,9 +4,10 @@ use validator::Validate;
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, Type)]
 #[sqlx(type_name = "GENDER")]
+#[serde(rename_all = "UPPERCASE")]
 pub enum Gender {
-    MALE,
-    FEMALE,
+    Male,
+    Female,
 }
 
 #[derive(Validate, Serialize, Deserialize, sqlx::FromRow)]
