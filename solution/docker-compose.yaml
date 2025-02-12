@@ -1,0 +1,16 @@
+services:
+  solution:
+    build: .
+    image: solution
+    environment:
+      - PORT=8080
+      - DATABASE_URL=postgres://postgres:password@db:5432/prod
+
+  db:
+    image: postgres:17.2-alpine3.21
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=prod
+    ports:
+      - 5432:5432
