@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use axum::{
     extract::{Path, State},
     http::StatusCode,
@@ -17,7 +15,7 @@ use crate::{
 };
 
 pub async fn bulk(
-    State(state): State<Arc<AppState>>,
+    State(state): State<AppState>,
     Json(clients): Json<Vec<Client>>,
 ) -> Result<(StatusCode, Json<Vec<Client>>), Response<String>> {
     clients.validate().map_err(ProdError::InvalidRequest)?;
@@ -43,7 +41,7 @@ pub async fn bulk(
 }
 
 pub async fn get_client_by_id(
-    State(state): State<Arc<AppState>>,
+    State(state): State<AppState>,
     Path(client_id): Path<uuid::Uuid>,
 ) -> Result<(StatusCode, Json<Client>), Response<String>> {
     let mut conn = state.pool.conn().await?;
