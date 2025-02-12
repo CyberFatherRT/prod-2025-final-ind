@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::prelude::Type;
 use validator::Validate;
 
-#[derive(Debug, Serialize, Deserialize, Type)]
+#[derive(Serialize, Deserialize, Type)]
 #[sqlx(type_name = "CAMPAIGN_GENDER", rename_all = "UPPERCASE")]
 #[serde(rename_all = "UPPERCASE")]
 pub enum GenderForm {
@@ -11,12 +11,12 @@ pub enum GenderForm {
     All,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Default, Serialize, Deserialize)]
 pub struct TargetForm {
-    pub gender: GenderForm,
-    pub age_from: i32,
-    pub age_to: i32,
-    pub location: String,
+    pub gender: Option<GenderForm>,
+    pub age_from: Option<i32>,
+    pub age_to: Option<i32>,
+    pub location: Option<String>,
 }
 
 impl Validate for TargetForm {
@@ -28,7 +28,7 @@ impl Validate for TargetForm {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub struct CampaignForm {
     pub impressions_limit: i32,
     pub clicks_limit: i32,
@@ -38,12 +38,14 @@ pub struct CampaignForm {
     pub ad_text: String,
     pub start_date: i32,
     pub end_date: i32,
-    pub targeting: TargetForm,
+    pub targeting: Option<TargetForm>,
 }
 
 impl Validate for CampaignForm {
     fn validate(&self) -> Result<(), validator::ValidationErrors> {
-        self.targeting.validate()?;
+        if let Some(targeting) = &self.targeting {
+            targeting.validate()?;
+        };
 
         if self.start_date > self.end_date {
             return Err(validator::ValidationErrors::new());
@@ -51,4 +53,12 @@ impl Validate for CampaignForm {
 
         Ok(())
     }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct CampaignPatchForm {
+    pub cost_per_click: f64,
+    pub ad_title: String,
+    pub ad_text: String,
+    pub targeting: TargetForm,
 }
