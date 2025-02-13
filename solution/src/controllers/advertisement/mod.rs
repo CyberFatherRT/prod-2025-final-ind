@@ -33,7 +33,7 @@ impl AdModelController for AdvertisementModel {
             _ => ProdError::DatabaseError(err),
         })?;
 
-        info!("row: {:?}", row);
+        info!("get best ad row: {:?}", row);
         let advertisement = AdvertisementModel {
             campaign_id: row.campaign_id.expect("campaign_id"),
             ad_title: row.ad_title.expect("ad_name"),

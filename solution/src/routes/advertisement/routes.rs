@@ -3,9 +3,10 @@ use axum::{
     response::Response,
     Json,
 };
+use uuid::Uuid;
 
 use crate::{
-    forms::advertisement::{AdvertisementForm, AdvertisementPath, AdvertisementQuery},
+    forms::advertisement::{AdvertisementForm, AdvertisementQuery},
     models::advertisement::{AdModelController, AdvertisementModel},
     AppState,
 };
@@ -24,13 +25,12 @@ pub async fn get_ad(
 
 pub async fn click_ad(
     State(state): State<AppState>,
-    Path(path): Path<AdvertisementPath>,
+    Path(campaign_id): Path<Uuid>,
     Json(body): Json<AdvertisementForm>,
 ) -> Result<(), Response<String>> {
     // FIX: get current date from redis
     let date = 0;
     let AdvertisementForm { client_id } = body;
-    let AdvertisementPath { campaign_id } = path;
 
     AdvertisementModel::click_ad(state.pool, client_id, campaign_id, date).await?;
 
