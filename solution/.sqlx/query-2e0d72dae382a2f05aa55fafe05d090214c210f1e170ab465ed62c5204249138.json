@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO ad_clicks(client_id, campaign_id, advertiser_id, click_date)\n            SELECT $1, $2, advertiser_id, $3 FROM campaigns WHERE id = $2\n            ON CONFLICT DO NOTHING\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "2e0d72dae382a2f05aa55fafe05d090214c210f1e170ab465ed62c5204249138"
+}

@@ -14,6 +14,10 @@ pub enum ProdError {
     #[error("database error")]
     DatabaseError(#[from] sqlx::Error),
 
+    /// An error occured when connection to or using the redis.
+    #[error("redis error")]
+    RedisError(#[from] redis::RedisError),
+
     /// Not found error
     #[error("not found")]
     NotFound(String),
@@ -29,10 +33,11 @@ impl From<ProdError> for Response<String> {
         let builder = Response::builder();
         match prod_error {
             ProdError::InvalidRequest(_) => builder.status(StatusCode::BAD_REQUEST),
+            ProdError::AlreadyExists(_) => builder.status(StatusCode::BAD_REQUEST),
             ProdError::DatabaseError(_) => builder.status(StatusCode::INTERNAL_SERVER_ERROR),
+            ProdError::RedisError(_) => builder.status(StatusCode::INTERNAL_SERVER_ERROR),
             ProdError::NotFound(_) => builder.status(StatusCode::NOT_FOUND),
             ProdError::Unknown(_) => builder.status(StatusCode::INTERNAL_SERVER_ERROR),
-            ProdError::AlreadyExists(_) => builder.status(StatusCode::BAD_REQUEST),
         }
         .body(error)
         .unwrap()

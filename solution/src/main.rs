@@ -4,7 +4,7 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use routes::{advertisement, advertisers, clients, statistics};
+use routes::{advertisement, advertisers, clients, statistics, time};
 use sqlx::PgPool;
 use tokio::net::TcpListener;
 use tracing::Level;
@@ -22,6 +22,7 @@ mod utils;
 #[derive(Clone)]
 pub struct AppState {
     pub pool: PgPool,
+    pub rclient: redis::Client,
 }
 
 #[tokio::main]
@@ -36,11 +37,13 @@ async fn main() -> anyhow::Result<()> {
 
     let port = env("PORT");
     let db_url = env("DATABASE_URL");
+    let redis_url = env("REDIS_URL");
 
     let pool = PgPool::connect(&db_url).await?;
-
     sqlx::migrate!("./migrations").run(&pool).await?;
-    let app_state = AppState { pool };
+
+    let rclient = redis::Client::open(redis_url)?;
+    let app_state = AppState { pool, rclient };
 
     let api = Router::new()
         .route("/health", get(StatusCode::OK))
@@ -49,6 +52,7 @@ async fn main() -> anyhow::Result<()> {
         .nest("/advertisers", advertisers::get_routes())
         .nest("/ads", advertisement::get_routes())
         .nest("/stats", statistics::get_routes())
+        .nest("/time", time::get_routes())
         .layer(from_fn(log_request))
         .with_state(app_state);
 
