@@ -7,11 +7,8 @@ use axum::{
 use validator::Validate;
 
 use crate::{
-    controllers::clients::ClientController,
-    db::Db,
-    errors::ProdError,
-    models::clients::{ClientModel, GenderModel},
-    AppState,
+    controllers::clients::ClientController, db::Db, errors::ProdError,
+    models::clients::ClientModel, AppState,
 };
 
 pub async fn bulk(

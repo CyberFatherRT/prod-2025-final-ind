@@ -1,0 +1,38 @@
+use serde::{Deserialize, Serialize};
+use uuid::Uuid;
+use validator::Validate;
+
+use crate::models::advertisers::{AdvertiserModel, MlScoreModel};
+
+#[derive(Validate, Serialize, Deserialize, sqlx::FromRow)]
+pub struct AdvertiserForm {
+    #[serde(rename = "advertiser_id")]
+    pub id: Uuid,
+    pub name: String,
+}
+
+#[derive(Validate, Serialize, Deserialize, sqlx::FromRow)]
+pub struct MlScoreForm {
+    pub client_id: Uuid,
+    pub advertiser_id: Uuid,
+    pub score: i32,
+}
+
+impl From<&AdvertiserForm> for AdvertiserModel {
+    fn from(value: &AdvertiserForm) -> Self {
+        AdvertiserModel {
+            id: value.id,
+            name: value.name.clone(),
+        }
+    }
+}
+
+impl From<&MlScoreForm> for MlScoreModel {
+    fn from(value: &MlScoreForm) -> MlScoreModel {
+        MlScoreModel {
+            client_id: value.client_id,
+            advertiser_id: value.advertiser_id,
+            score: value.score,
+        }
+    }
+}

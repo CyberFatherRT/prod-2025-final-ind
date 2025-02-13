@@ -7,86 +7,42 @@ use axum::{
 use validator::Validate;
 
 use crate::{
+    controllers::advertisers::AdvertiserContoller,
     db::Db,
     errors::ProdError,
-    map_vec,
-    models::advertisers::{Advertiser, MlScore},
+    forms::advertisers::{AdvertiserForm, MlScoreForm},
+    models::advertisers::AdvertiserModel,
     AppState,
 };
 
 pub async fn bulk(
     State(state): State<AppState>,
-    Json(clients): Json<Vec<Advertiser>>,
-) -> Result<(StatusCode, Json<Vec<Advertiser>>), Response<String>> {
-    clients.validate().map_err(ProdError::InvalidRequest)?;
+    Json(advertisers): Json<Vec<AdvertiserForm>>,
+) -> Result<(StatusCode, Json<Vec<AdvertiserModel>>), Response<String>> {
+    advertisers.validate().map_err(ProdError::InvalidRequest)?;
 
     let mut conn = state.pool.conn().await?;
+    let advertisers = AdvertiserModel::bulk(&mut *conn, advertisers).await?;
 
-    let _ = sqlx::query!(
-        r#"
-        INSERT INTO advertisers(id, name)
-        SELECT * FROM UNNEST($1::UUID[], $2::VARCHAR[])
-        "#,
-        &map_vec!(clients, id),
-        &map_vec!(clients, name),
-    )
-    .execute(&mut *conn)
-    .await
-    .map_err(ProdError::DatabaseError)?;
-
-    Ok((StatusCode::CREATED, Json(clients)))
+    Ok((StatusCode::CREATED, Json(advertisers)))
 }
 
 pub async fn get_advertiser_by_id(
     State(state): State<AppState>,
     Path(advertiser_id): Path<uuid::Uuid>,
-) -> Result<(StatusCode, Json<Advertiser>), Response<String>> {
+) -> Result<(StatusCode, Json<AdvertiserModel>), Response<String>> {
     let mut conn = state.pool.conn().await?;
-
-    let advertiser = sqlx::query_as!(
-        Advertiser,
-        r#"
-        SELECT id, name FROM advertisers
-        WHERE id = $1
-        "#,
-        advertiser_id
-    )
-    .fetch_one(&mut *conn)
-    .await
-    .map_err(|err| match err {
-        sqlx::Error::RowNotFound => {
-            ProdError::NotFound("No advertiser was found with that id.".to_string())
-        }
-        err => ProdError::DatabaseError(err),
-    })?;
+    let advertiser = AdvertiserModel::get_advertiser_by_id(&mut *conn, advertiser_id).await?;
 
     Ok((StatusCode::OK, Json(advertiser)))
 }
 
 pub async fn ml_scores(
     State(state): State<AppState>,
-    Json(ml_score): Json<MlScore>,
+    Json(ml_score): Json<MlScoreForm>,
 ) -> Result<StatusCode, Response<String>> {
     let mut conn = state.pool.conn().await?;
-
-    let _ = sqlx::query!(
-        r#"
-        INSERT INTO ml_scores(client_id, advertiser_id, score)
-        VALUES ($1, $2, $3)
-        ON CONFLICT (client_id, advertiser_id) DO UPDATE SET score = excluded.score
-        "#,
-        ml_score.client_id,
-        ml_score.advertiser_id,
-        ml_score.score
-    )
-    .execute(&mut *conn)
-    .await
-    .map_err(|err| match err {
-        sqlx::Error::Database(err) if err.is_foreign_key_violation() => {
-            ProdError::NotFound("No client or advertiser was found with these ids".to_string())
-        }
-        _ => ProdError::DatabaseError(err),
-    })?;
+    let _ = AdvertiserModel::ml_scores(&mut *conn, ml_score).await?;
 
     Ok(StatusCode::OK)
 }
