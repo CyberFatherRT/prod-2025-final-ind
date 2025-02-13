@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        UPDATE campaigns\n        SET cost_per_click = COALESCE($1, cost_per_click),\n            ad_title = COALESCE($2, ad_title),\n            ad_text = COALESCE($3, ad_text),\n            gender = COALESCE($4, gender),\n            age_from = COALESCE($5, age_from),\n            age_to = COALESCE($6, age_to),\n            location = COALESCE($7, location)\n        WHERE advertiser_id = $8 AND id = $9\n        RETURNING id, advertiser_id, impressions_limit, clicks_limit, cost_per_impression,\n                  cost_per_click, ad_title, ad_text, start_date, end_date,\n                  gender AS \"gender: GenderModel\",\n                  age_from, age_to, location\n        ",
+  "query": "\n            SELECT id, advertiser_id, impressions_limit, clicks_limit, cost_per_impression,\n                   cost_per_click, ad_title, ad_text, start_date, end_date,\n                   gender as \"gender: CampaignGenderModel\", age_from, age_to, location\n            FROM campaigns\n            WHERE advertiser_id = $1 AND id = $2\n            ",
   "describe": {
     "columns": [
       {
@@ -55,7 +55,7 @@
       },
       {
         "ordinal": 10,
-        "name": "gender: GenderModel",
+        "name": "gender: CampaignGenderModel",
         "type_info": {
           "Custom": {
             "name": "campaign_gender",
@@ -87,24 +87,6 @@
     ],
     "parameters": {
       "Left": [
-        "Float8",
-        "Text",
-        "Text",
-        {
-          "Custom": {
-            "name": "campaign_gender",
-            "kind": {
-              "Enum": [
-                "MALE",
-                "FEMALE",
-                "ALL"
-              ]
-            }
-          }
-        },
-        "Int4",
-        "Int4",
-        "Text",
         "Uuid",
         "Uuid"
       ]
@@ -126,5 +108,5 @@
       true
     ]
   },
-  "hash": "ee516c6dd499b7277dcff541945ff08e937c6f0c4837616d9619e5c4ed30ca48"
+  "hash": "52c5a9bf3b027009377cddaa29881e6c25950b30439ad57ec0905d023fbe4dfa"
 }

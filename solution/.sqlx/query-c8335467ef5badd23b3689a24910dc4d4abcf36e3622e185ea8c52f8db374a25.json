@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT id, advertiser_id, impressions_limit, clicks_limit, cost_per_impression,\n               cost_per_click, ad_title, ad_text, start_date, end_date,\n               gender as \"gender: GenderModel\", age_from, age_to, location\n        FROM campaigns\n        WHERE advertiser_id = $1\n        ",
+  "query": "\n            INSERT INTO campaigns(advertiser_id, impressions_limit, clicks_limit, cost_per_impression, cost_per_click, ad_title,\n                         ad_text, start_date, end_date, gender, age_from, age_to, location)\n            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)\n            RETURNING id, advertiser_id, impressions_limit, clicks_limit, cost_per_impression,\n                      cost_per_click, ad_title, ad_text, start_date, end_date,\n                      gender AS \"gender: CampaignGenderModel\",\n                      age_from, age_to, location\n            ",
   "describe": {
     "columns": [
       {
@@ -55,7 +55,7 @@
       },
       {
         "ordinal": 10,
-        "name": "gender: GenderModel",
+        "name": "gender: CampaignGenderModel",
         "type_info": {
           "Custom": {
             "name": "campaign_gender",
@@ -87,7 +87,30 @@
     ],
     "parameters": {
       "Left": [
-        "Uuid"
+        "Uuid",
+        "Int4",
+        "Int4",
+        "Float8",
+        "Float8",
+        "Text",
+        "Text",
+        "Int4",
+        "Int4",
+        {
+          "Custom": {
+            "name": "campaign_gender",
+            "kind": {
+              "Enum": [
+                "MALE",
+                "FEMALE",
+                "ALL"
+              ]
+            }
+          }
+        },
+        "Int4",
+        "Int4",
+        "Text"
       ]
     },
     "nullable": [
@@ -107,5 +130,5 @@
       true
     ]
   },
-  "hash": "29584cee057abe727d75bd16a103e4d5dee544f012676afba2116e7d3670614d"
+  "hash": "c8335467ef5badd23b3689a24910dc4d4abcf36e3622e185ea8c52f8db374a25"
 }

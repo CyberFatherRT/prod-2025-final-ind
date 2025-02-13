@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT id, name FROM advertisers\n        WHERE id = $1\n        ",
+  "query": "\n            SELECT id, name FROM advertisers\n            WHERE id = $1\n            ",
   "describe": {
     "columns": [
       {
@@ -24,5 +24,5 @@
       false
     ]
   },
-  "hash": "5e5192a5671efebfd4149a9bce4729d3b742c8cbd25424454592b4d0ea57d19b"
+  "hash": "f77aa5fbc64481865c82ddaf761cd5fbc1e55494011a14a16ba71541a83b6b0d"
 }

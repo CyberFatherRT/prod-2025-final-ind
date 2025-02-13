@@ -22,7 +22,7 @@ pub async fn bulk(
     advertisers.validate().map_err(ProdError::InvalidRequest)?;
 
     let mut conn = state.pool.conn().await?;
-    let advertisers = AdvertiserModel::bulk(&mut *conn, advertisers).await?;
+    let advertisers = AdvertiserModel::bulk(&mut conn, advertisers).await?;
 
     Ok((StatusCode::CREATED, Json(advertisers)))
 }
@@ -32,7 +32,7 @@ pub async fn get_advertiser_by_id(
     Path(advertiser_id): Path<uuid::Uuid>,
 ) -> Result<(StatusCode, Json<AdvertiserModel>), Response<String>> {
     let mut conn = state.pool.conn().await?;
-    let advertiser = AdvertiserModel::get_advertiser_by_id(&mut *conn, advertiser_id).await?;
+    let advertiser = AdvertiserModel::get_advertiser_by_id(&mut conn, advertiser_id).await?;
 
     Ok((StatusCode::OK, Json(advertiser)))
 }
@@ -42,7 +42,7 @@ pub async fn ml_scores(
     Json(ml_score): Json<MlScoreForm>,
 ) -> Result<StatusCode, Response<String>> {
     let mut conn = state.pool.conn().await?;
-    let _ = AdvertiserModel::ml_scores(&mut *conn, ml_score).await?;
+    AdvertiserModel::ml_scores(&mut conn, ml_score).await?;
 
     Ok(StatusCode::OK)
 }

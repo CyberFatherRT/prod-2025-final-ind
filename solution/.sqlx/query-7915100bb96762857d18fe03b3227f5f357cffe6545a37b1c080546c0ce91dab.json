@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO advertisers(id, name)\n            SELECT * FROM UNNEST($1::UUID[], $2::VARCHAR[])\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "UuidArray",
+        "VarcharArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "7915100bb96762857d18fe03b3227f5f357cffe6545a37b1c080546c0ce91dab"
+}

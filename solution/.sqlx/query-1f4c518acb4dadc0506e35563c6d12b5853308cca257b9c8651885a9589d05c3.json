@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT id as client_id,\n               login, age, location,\n               gender as \"gender: Gender\"\n        FROM clients\n        WHERE id = $1\n        LIMIT 1\n        ",
+  "query": "\n            SELECT id as client_id,\n                   login, age, location,\n                   gender as \"gender: ClientGenderModel\"\n            FROM clients\n            WHERE id = $1\n            LIMIT 1\n            ",
   "describe": {
     "columns": [
       {
@@ -25,7 +25,7 @@
       },
       {
         "ordinal": 4,
-        "name": "gender: Gender",
+        "name": "gender: ClientGenderModel",
         "type_info": {
           "Custom": {
             "name": "gender",
@@ -52,5 +52,5 @@
       false
     ]
   },
-  "hash": "75bdbb3183e4d1699a99b27a6bb15bc240304297d55e9cd362facf81d6b74336"
+  "hash": "1f4c518acb4dadc0506e35563c6d12b5853308cca257b9c8651885a9589d05c3"
 }

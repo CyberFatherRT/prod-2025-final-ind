@@ -38,7 +38,12 @@ impl ClientController for ClientModel {
         )
         .fetch_all(conn)
         .await
-        .map_err(ProdError::DatabaseError)?;
+        .map_err(|err| match err {
+            sqlx::Error::Database(e) if e.is_unique_violation() => {
+                ProdError::AlreadyExists("Client with that id already exists.".to_string())
+            }
+            _ => ProdError::DatabaseError(err),
+        })?;
 
         let clients = clients.iter().map(|x| x.into()).collect();
         Ok(clients)

@@ -4,7 +4,7 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use routes::{advertisers, clients};
+use routes::{advertisement, advertisers, clients};
 use sqlx::PgPool;
 use tokio::net::TcpListener;
 use tracing::Level;
@@ -47,6 +47,7 @@ async fn main() -> anyhow::Result<()> {
         .route("/ml-scores", post(advertisers::ml_scores))
         .nest("/clients", clients::get_routes())
         .nest("/advertisers", advertisers::get_routes())
+        .nest("/ads", advertisement::get_routes())
         .layer(from_fn(log_request))
         .with_state(app_state);
 

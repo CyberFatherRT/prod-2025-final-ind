@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS campaigns
     age_from            INT,
     age_to              INT,
     location            TEXT,
-    CONSTRAINT advertiser_id_fk FOREIGN KEY (advertiser_id) REFERENCES advertisers (id)
+    FOREIGN KEY (advertiser_id) REFERENCES advertisers (id)
 );
 
 CREATE INDEX campaign_advertiser_id_idx ON campaigns (advertiser_id);

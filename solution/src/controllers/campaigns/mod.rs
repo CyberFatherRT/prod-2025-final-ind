@@ -77,8 +77,7 @@ impl CampaignController for CampaignModel {
             return Err(ProdError::NotFound(format!(
                 "No campaigns were found for advertiser - `{:?}`",
                 advertiser_id
-            ))
-            .into());
+            )));
         }
 
         let campaigns = paginate(rows, query.size, query.page)
@@ -193,8 +192,7 @@ impl CampaignController for CampaignModel {
             return Err(ProdError::NotFound(format!(
                 "No campaign was found with id - `{:?}` for advertiser - `{:?}`",
                 campaign_id, advertiser_id
-            ))
-            .into());
+            )));
         }
 
         Ok(())

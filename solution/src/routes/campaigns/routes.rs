@@ -23,7 +23,7 @@ pub async fn create(
 ) -> Result<(StatusCode, Json<CampaignModel>), Response<String>> {
     campaign.validate().map_err(ProdError::InvalidRequest)?;
     let mut conn = state.pool.conn().await?;
-    let campaign = CampaignModel::create(&mut *conn, advertiser_id, campaign).await?;
+    let campaign = CampaignModel::create(&mut conn, advertiser_id, campaign).await?;
 
     Ok((StatusCode::CREATED, Json(campaign)))
 }
@@ -34,7 +34,7 @@ pub async fn list(
     Query(query): Query<CampaignQuery>,
 ) -> Result<Json<Vec<CampaignModel>>, Response<String>> {
     let mut conn = state.pool.conn().await?;
-    let campaigns = CampaignModel::list(&mut *conn, advertiser_id, query).await?;
+    let campaigns = CampaignModel::list(&mut conn, advertiser_id, query).await?;
 
     Ok(Json(campaigns))
 }
@@ -45,10 +45,9 @@ pub async fn update(
     Json(campaign): Json<CampaignPatchForm>,
 ) -> Result<Json<CampaignModel>, Response<String>> {
     let mut conn = state.pool.conn().await?;
-    let campaing = CampaignModel::update(&mut *conn, advertiser_id, campaign_id, campaign).await?;
+    let campaing = CampaignModel::update(&mut conn, advertiser_id, campaign_id, campaign).await?;
 
-    let foo = campaing;
-    Ok(Json(foo))
+    Ok(Json(campaing))
 }
 
 pub async fn get_campaign_by_id(
@@ -56,7 +55,7 @@ pub async fn get_campaign_by_id(
     Path((advertiser_id, campaign_id)): Path<(Uuid, Uuid)>,
 ) -> Result<Json<CampaignModel>, Response<String>> {
     let mut conn = state.pool.conn().await?;
-    let campaign = CampaignModel::get(&mut *conn, advertiser_id, campaign_id).await?;
+    let campaign = CampaignModel::get(&mut conn, advertiser_id, campaign_id).await?;
 
     Ok(Json(campaign))
 }
@@ -66,7 +65,7 @@ pub async fn delete_campaign(
     Path((advertiser_id, campaign_id)): Path<(Uuid, Uuid)>,
 ) -> Result<StatusCode, Response<String>> {
     let mut conn = state.pool.conn().await?;
-    let _ = CampaignModel::delete(&mut *conn, advertiser_id, campaign_id).await?;
+    CampaignModel::delete(&mut conn, advertiser_id, campaign_id).await?;
 
     Ok(StatusCode::NO_CONTENT)
 }

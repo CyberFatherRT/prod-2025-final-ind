@@ -18,7 +18,7 @@ pub async fn bulk(
     clients.validate().map_err(ProdError::InvalidRequest)?;
 
     let mut conn = state.pool.conn().await?;
-    let clients = ClientModel::bulk(&mut *conn, clients).await?;
+    let clients = ClientModel::bulk(&mut conn, clients).await?;
 
     Ok((StatusCode::CREATED, Json(clients)))
 }
@@ -28,7 +28,7 @@ pub async fn get_client_by_id(
     Path(client_id): Path<uuid::Uuid>,
 ) -> Result<(StatusCode, Json<ClientModel>), Response<String>> {
     let mut conn = state.pool.conn().await?;
-    let client = ClientModel::get_client_by_id(&mut *conn, client_id).await?;
+    let client = ClientModel::get_client_by_id(&mut conn, client_id).await?;
 
     Ok((StatusCode::OK, Json(client)))
 }
