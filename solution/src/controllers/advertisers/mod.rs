@@ -31,6 +31,8 @@ impl AdvertiserContoller for AdvertiserModel {
             r#"
             INSERT INTO advertisers(id, name)
             SELECT * FROM UNNEST($1::UUID[], $2::VARCHAR[])
+            ON CONFLICT (id) DO UPDATE SET
+                name = EXCLUDED.name
             "#,
             &map_vec!(advertisers, id),
             &map_vec!(advertisers, name),

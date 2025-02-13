@@ -27,9 +27,14 @@ impl ClientController for ClientModel {
     ) -> Result<Vec<ClientModel>, ProdError> {
         let _ = sqlx::query!(
             r#"
-        INSERT INTO clients(id, login, age, location, gender)
-        SELECT * FROM UNNEST($1::UUID[], $2::VARCHAR[], $3::INT[], $4::VARCHAR[], $5::GENDER[])
-        "#,
+            INSERT INTO clients(id, login, age, location, gender)
+            SELECT * FROM UNNEST($1::UUID[], $2::VARCHAR[], $3::INT[], $4::VARCHAR[], $5::GENDER[])
+            ON CONFLICT (id) DO UPDATE SET
+                login = EXCLUDED.login,
+                age = EXCLUDED.age,
+                location = EXCLUDED.location,
+                gender = EXCLUDED.gender
+            "#,
             &map_vec!(clients, client_id),
             &map_vec!(clients, login),
             &map_vec!(clients, age),
@@ -38,12 +43,7 @@ impl ClientController for ClientModel {
         )
         .fetch_all(conn)
         .await
-        .map_err(|err| match err {
-            sqlx::Error::Database(e) if e.is_unique_violation() => {
-                ProdError::AlreadyExists("Client with that id already exists.".to_string())
-            }
-            _ => ProdError::DatabaseError(err),
-        })?;
+        .map_err(ProdError::DatabaseError)?;
 
         let clients = clients.iter().map(|x| x.into()).collect();
         Ok(clients)
