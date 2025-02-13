@@ -3,18 +3,18 @@ use sqlx::Type;
 use validator::Validate;
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, Type)]
-#[sqlx(type_name = "GENDER")]
+#[sqlx(type_name = "GENDER", rename_all = "UPPERCASE")]
 #[serde(rename_all = "UPPERCASE")]
-pub enum Gender {
+pub enum GenderModel {
     Male,
     Female,
 }
 
 #[derive(Validate, Serialize, Deserialize, sqlx::FromRow)]
-pub struct Client {
+pub struct ClientModel {
     pub client_id: uuid::Uuid,
     pub login: String,
     pub age: i32,
     pub location: String,
-    pub gender: Gender,
+    pub gender: GenderModel,
 }

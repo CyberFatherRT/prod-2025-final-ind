@@ -4,7 +4,7 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use controllers::{advertisers, clients};
+use routes::{advertisers, clients};
 use sqlx::PgPool;
 use tokio::net::TcpListener;
 use tracing::Level;
@@ -16,6 +16,7 @@ mod errors;
 mod forms;
 mod macros;
 mod models;
+mod routes;
 mod utils;
 
 #[derive(Clone)]

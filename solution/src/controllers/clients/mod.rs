@@ -1,14 +1,72 @@
-mod routes;
+use sqlx::PgConnection;
+use uuid::Uuid;
 
-use crate::AppState;
-use axum::{
-    routing::{get, post},
-    Router,
+use crate::{
+    errors::ProdError,
+    map_vec,
+    models::clients::{ClientModel, GenderModel},
 };
-use routes::{bulk, get_client_by_id};
 
-pub fn get_routes() -> Router<AppState> {
-    Router::new()
-        .route("/bulk", post(bulk))
-        .route("/{client_id}", get(get_client_by_id))
+pub trait ClientController {
+    async fn bulk(
+        conn: &mut PgConnection,
+        clients: Vec<ClientModel>,
+    ) -> Result<Vec<ClientModel>, ProdError>;
+
+    async fn get_client_by_id(
+        conn: &mut PgConnection,
+        client_id: Uuid,
+    ) -> Result<ClientModel, ProdError>;
+}
+
+impl ClientController for ClientModel {
+    async fn bulk(
+        conn: &mut PgConnection,
+        clients: Vec<ClientModel>,
+    ) -> Result<Vec<ClientModel>, ProdError> {
+        let _ = sqlx::query!(
+            r#"
+        INSERT INTO clients(id, login, age, location, gender)
+        SELECT * FROM UNNEST($1::UUID[], $2::VARCHAR[], $3::INT[], $4::VARCHAR[], $5::GENDER[])
+        "#,
+            &map_vec!(clients, client_id),
+            &map_vec!(clients, login),
+            &map_vec!(clients, age),
+            &map_vec!(clients, location),
+            map_vec!(clients, gender) as Vec<GenderModel>,
+        )
+        .fetch_all(conn)
+        .await
+        .map_err(ProdError::DatabaseError)?;
+
+        Ok(clients)
+    }
+
+    async fn get_client_by_id(
+        conn: &mut PgConnection,
+        client_id: Uuid,
+    ) -> Result<ClientModel, ProdError> {
+        let client = sqlx::query_as!(
+            ClientModel,
+            r#"
+            SELECT id as client_id,
+                   login, age, location,
+                   gender as "gender: GenderModel"
+            FROM clients
+            WHERE id = $1
+            LIMIT 1
+            "#,
+            client_id
+        )
+        .fetch_one(conn)
+        .await
+        .map_err(|err| match err {
+            sqlx::Error::RowNotFound => {
+                ProdError::NotFound("No client was found with that id.".to_string())
+            }
+            err => ProdError::DatabaseError(err),
+        })?;
+
+        Ok(client)
+    }
 }
