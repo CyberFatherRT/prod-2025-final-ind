@@ -5,7 +5,7 @@ use validator::Validate;
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, Type)]
 #[sqlx(type_name = "GENDER", rename_all = "UPPERCASE")]
 #[serde(rename_all = "UPPERCASE")]
-pub enum GenderModel {
+pub enum ClientGenderModel {
     Male,
     Female,
 }
@@ -16,5 +16,5 @@ pub struct ClientModel {
     pub login: String,
     pub age: i32,
     pub location: String,
-    pub gender: GenderModel,
+    pub gender: ClientGenderModel,
 }

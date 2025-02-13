@@ -7,13 +7,13 @@ use axum::{
 use validator::Validate;
 
 use crate::{
-    controllers::clients::ClientController, db::Db, errors::ProdError,
+    controllers::clients::ClientController, db::Db, errors::ProdError, forms::clients::ClientForm,
     models::clients::ClientModel, AppState,
 };
 
 pub async fn bulk(
     State(state): State<AppState>,
-    Json(clients): Json<Vec<ClientModel>>,
+    Json(clients): Json<Vec<ClientForm>>,
 ) -> Result<(StatusCode, Json<Vec<ClientModel>>), Response<String>> {
     clients.validate().map_err(ProdError::InvalidRequest)?;
 

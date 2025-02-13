@@ -3,14 +3,15 @@ use uuid::Uuid;
 
 use crate::{
     errors::ProdError,
+    forms::clients::{ClientForm, ClientGenderForm},
     map_vec,
-    models::clients::{ClientModel, GenderModel},
+    models::clients::{ClientGenderModel, ClientModel},
 };
 
 pub trait ClientController {
     async fn bulk(
         conn: &mut PgConnection,
-        clients: Vec<ClientModel>,
+        clients: Vec<ClientForm>,
     ) -> Result<Vec<ClientModel>, ProdError>;
 
     async fn get_client_by_id(
@@ -22,7 +23,7 @@ pub trait ClientController {
 impl ClientController for ClientModel {
     async fn bulk(
         conn: &mut PgConnection,
-        clients: Vec<ClientModel>,
+        clients: Vec<ClientForm>,
     ) -> Result<Vec<ClientModel>, ProdError> {
         let _ = sqlx::query!(
             r#"
@@ -33,12 +34,13 @@ impl ClientController for ClientModel {
             &map_vec!(clients, login),
             &map_vec!(clients, age),
             &map_vec!(clients, location),
-            map_vec!(clients, gender) as Vec<GenderModel>,
+            map_vec!(clients, gender) as Vec<ClientGenderForm>,
         )
         .fetch_all(conn)
         .await
         .map_err(ProdError::DatabaseError)?;
 
+        let clients = clients.iter().map(|x| x.into()).collect();
         Ok(clients)
     }
 
@@ -51,7 +53,7 @@ impl ClientController for ClientModel {
             r#"
             SELECT id as client_id,
                    login, age, location,
-                   gender as "gender: GenderModel"
+                   gender as "gender: ClientGenderModel"
             FROM clients
             WHERE id = $1
             LIMIT 1
