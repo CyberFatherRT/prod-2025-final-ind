@@ -5,7 +5,7 @@ use validator::Validate;
 #[derive(Serialize, Deserialize, Type)]
 #[sqlx(type_name = "CAMPAIGN_GENDER", rename_all = "UPPERCASE")]
 #[serde(rename_all = "UPPERCASE")]
-pub enum GenderForm {
+pub enum CampaignGenderForm {
     Male,
     Female,
     All,
@@ -13,7 +13,7 @@ pub enum GenderForm {
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct TargetForm {
-    pub gender: Option<GenderForm>,
+    pub gender: Option<CampaignGenderForm>,
     pub age_from: Option<i32>,
     pub age_to: Option<i32>,
     pub location: Option<String>,

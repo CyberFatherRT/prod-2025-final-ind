@@ -1,19 +1,27 @@
 use serde::{Deserialize, Serialize};
-use sqlx::prelude::{FromRow, Type};
+use sqlx::{
+    prelude::{FromRow, Type},
+    PgConnection,
+};
 use uuid::Uuid;
+
+use crate::{
+    errors::ProdError,
+    forms::campaigns::{CampaignForm, CampaignPatchForm, CampaignQuery},
+};
 
 #[derive(Debug, Serialize, Deserialize, Type, Clone)]
 #[sqlx(type_name = "CAMPAIGN_GENDER", rename_all = "UPPERCASE")]
 #[serde(rename_all = "UPPERCASE")]
-pub enum GenderModel {
+pub enum CampaignGenderModel {
     Male,
     Female,
     Any,
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
-pub struct TargetModel {
-    pub gender: Option<GenderModel>,
+pub struct CampaignTargetModel {
+    pub gender: Option<CampaignGenderModel>,
     pub age_from: Option<i32>,
     pub age_to: Option<i32>,
     pub location: Option<String>,
@@ -32,7 +40,7 @@ pub struct CampaignModel {
     pub ad_text: String,
     pub start_date: i32,
     pub end_date: i32,
-    pub targeting: TargetModel,
+    pub targeting: CampaignTargetModel,
 }
 
 #[derive(Clone, Debug, FromRow)]
@@ -47,7 +55,7 @@ pub struct CampaignRow {
     pub ad_text: String,
     pub start_date: i32,
     pub end_date: i32,
-    pub gender: Option<GenderModel>,
+    pub gender: Option<CampaignGenderModel>,
     pub age_from: Option<i32>,
     pub age_to: Option<i32>,
     pub location: Option<String>,
@@ -66,7 +74,7 @@ impl From<CampaignRow> for CampaignModel {
             ad_text: row.ad_text,
             start_date: row.start_date,
             end_date: row.end_date,
-            targeting: TargetModel {
+            targeting: CampaignTargetModel {
                 gender: row.gender,
                 age_from: row.age_from,
                 age_to: row.age_to,
@@ -74,4 +82,37 @@ impl From<CampaignRow> for CampaignModel {
             },
         }
     }
+}
+
+pub trait CampaignController {
+    async fn create(
+        conn: &mut PgConnection,
+        advertiser_id: Uuid,
+        campaign: CampaignForm,
+    ) -> Result<CampaignModel, ProdError>;
+
+    async fn list(
+        conn: &mut PgConnection,
+        advertiser_id: Uuid,
+        query: CampaignQuery,
+    ) -> Result<Vec<CampaignModel>, ProdError>;
+
+    async fn update(
+        conn: &mut PgConnection,
+        advertiser_id: Uuid,
+        campaign_id: Uuid,
+        campaign: CampaignPatchForm,
+    ) -> Result<CampaignModel, ProdError>;
+
+    async fn get(
+        conn: &mut PgConnection,
+        advertiser_id: Uuid,
+        campaign_id: Uuid,
+    ) -> Result<CampaignModel, ProdError>;
+
+    async fn delete(
+        conn: &mut PgConnection,
+        advertiser_id: Uuid,
+        campaign_id: Uuid,
+    ) -> Result<(), ProdError>;
 }
