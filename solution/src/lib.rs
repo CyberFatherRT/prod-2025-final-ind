@@ -1,4 +1,9 @@
+#![deny(clippy::unwrap_used)]
+#![warn(clippy::all, clippy::pedantic, clippy::nursery)]
 #![allow(async_fn_in_trait)]
+#![allow(clippy::missing_errors_doc)]
+#![allow(clippy::missing_panics_doc)]
+#![allow(clippy::must_use_candidate)]
 
 use axum::{
     http::StatusCode,

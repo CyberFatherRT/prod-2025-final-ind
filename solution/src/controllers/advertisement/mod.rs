@@ -14,7 +14,7 @@ impl AdModelController for AdvertisementModel {
         pool: Pool<Postgres>,
         client_id: uuid::Uuid,
         date: i32,
-    ) -> Result<AdvertisementModel, ProdError> {
+    ) -> Result<Self, ProdError> {
         let mut tx = pool.begin().await?;
 
         let row = sqlx::query!(
@@ -28,13 +28,13 @@ impl AdModelController for AdvertisementModel {
         .await
         .map_err(|err| match err {
             sqlx::Error::RowNotFound => {
-                ProdError::NotFound(format!("No advertisement found for client {}", client_id))
+                ProdError::NotFound(format!("No advertisement found for client {client_id}"))
             }
             _ => ProdError::DatabaseError(err),
         })?;
 
         info!("get best ad row: {:?}", row);
-        let advertisement = AdvertisementModel {
+        let advertisement = Self {
             campaign_id: row.campaign_id.expect("campaign_id"),
             ad_title: row.ad_title.expect("ad_name"),
             ad_text: row.ad_text.expect("ad_text"),

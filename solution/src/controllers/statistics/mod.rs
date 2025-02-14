@@ -14,7 +14,7 @@ impl StatisticsModelController for StatisticsModel {
     async fn campaign_statistics(
         conn: &mut sqlx::PgConnection,
         campaign_id: Uuid,
-    ) -> Result<StatisticsModel, ProdError> {
+    ) -> Result<Self, ProdError> {
         let row = sqlx::query!(
             r#"
             SELECT * FROM get_ad_stats($1)
@@ -26,7 +26,7 @@ impl StatisticsModelController for StatisticsModel {
         .map_err(ProdError::DatabaseError)?;
 
         info!("campaign statistics row: {:?}", row);
-        let campaign_statistics = StatisticsModel {
+        let campaign_statistics = Self {
             impressions_count: row.impressions_count.expect("impressions_count"),
             clicks_count: row.clicks_count.expect("clicks_count"),
             conversion: row.conversion.expect("conversion"),
@@ -41,7 +41,7 @@ impl StatisticsModelController for StatisticsModel {
     async fn advertiser_statistics(
         conn: &mut sqlx::PgConnection,
         advertiser_id: Uuid,
-    ) -> Result<StatisticsModel, ProdError> {
+    ) -> Result<Self, ProdError> {
         let row = sqlx::query!(
             r#"
             SELECT * FROM get_advertiser_stats($1)
@@ -53,7 +53,7 @@ impl StatisticsModelController for StatisticsModel {
         .map_err(ProdError::DatabaseError)?;
 
         info!("advertiser statistics row: {:?}", row);
-        let advertiser_statistics = StatisticsModel {
+        let advertiser_statistics = Self {
             impressions_count: row.impressions_count.expect("impressions_count"),
             clicks_count: row.clicks_count.expect("clicks_count"),
             conversion: row.conversion.expect("conversion"),
@@ -70,7 +70,7 @@ impl DailyStatisticsModelController for DailyStatisticsModel {
     async fn campaign_daily_statistics(
         conn: &mut PgConnection,
         campaign_id: Uuid,
-    ) -> Result<Vec<DailyStatisticsModel>, ProdError> {
+    ) -> Result<Vec<Self>, ProdError> {
         let rows = sqlx::query!(
             r#"
             SELECT * FROM get_daily_stats_campaign($1)
@@ -84,7 +84,7 @@ impl DailyStatisticsModelController for DailyStatisticsModel {
         info!("campaign daily statistics rows: {:?}", rows);
         let daily_statistics_campaings = rows
             .into_iter()
-            .map(|row| DailyStatisticsModel {
+            .map(|row| Self {
                 impressions_count: row.impressions_count.expect("impressions_count"),
                 clicks_count: row.clicks_count.expect("clicks_count"),
                 conversion: row.conversion.expect("conversion"),
@@ -101,7 +101,7 @@ impl DailyStatisticsModelController for DailyStatisticsModel {
     async fn advertiser_daily_statistics(
         conn: &mut PgConnection,
         advertiser_id: Uuid,
-    ) -> Result<Vec<DailyStatisticsModel>, ProdError> {
+    ) -> Result<Vec<Self>, ProdError> {
         let rows = sqlx::query!(
             r#"
             SELECT * FROM get_daily_stats_advertiser($1)
@@ -115,7 +115,7 @@ impl DailyStatisticsModelController for DailyStatisticsModel {
         info!("advertiser daily statistics rows: {:?}", rows);
         let daily_statistics_advertisers = rows
             .into_iter()
-            .map(|row| DailyStatisticsModel {
+            .map(|row| Self {
                 impressions_count: row.impressions_count.expect("impressions_count"),
                 clicks_count: row.clicks_count.expect("clicks_count"),
                 conversion: row.conversion.expect("conversion"),

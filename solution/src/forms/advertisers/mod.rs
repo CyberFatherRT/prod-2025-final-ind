@@ -20,7 +20,7 @@ pub struct MlScoreForm {
 
 impl From<&AdvertiserForm> for AdvertiserModel {
     fn from(value: &AdvertiserForm) -> Self {
-        AdvertiserModel {
+        Self {
             id: value.id,
             name: value.name.clone(),
         }
@@ -28,8 +28,8 @@ impl From<&AdvertiserForm> for AdvertiserModel {
 }
 
 impl From<&MlScoreForm> for MlScoreModel {
-    fn from(value: &MlScoreForm) -> MlScoreModel {
-        MlScoreModel {
+    fn from(value: &MlScoreForm) -> Self {
+        Self {
             client_id: value.client_id,
             advertiser_id: value.advertiser_id,
             score: value.score,

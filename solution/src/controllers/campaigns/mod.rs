@@ -13,7 +13,7 @@ impl CampaignController for CampaignModel {
         conn: &mut PgConnection,
         advertiser_id: Uuid,
         campaign: CampaignForm,
-    ) -> Result<CampaignModel, ProdError> {
+    ) -> Result<Self, ProdError> {
         let targeting = campaign.targeting.unwrap_or_default();
 
         let row = sqlx::query_as!(
@@ -45,7 +45,7 @@ impl CampaignController for CampaignModel {
         .await
         .map_err(|err| match err {
             sqlx::Error::Database(err) if err.is_foreign_key_violation() => {
-                ProdError::NotFound(format!("No advertiser was found with that id - `{:?}`", advertiser_id))
+                ProdError::NotFound(format!("No advertiser was found with that id - `{advertiser_id:?}`"))
             },
             _ => ProdError::DatabaseError(err),
         })?;
@@ -57,7 +57,7 @@ impl CampaignController for CampaignModel {
         conn: &mut PgConnection,
         advertiser_id: Uuid,
         query: CampaignQuery,
-    ) -> Result<Vec<CampaignModel>, ProdError> {
+    ) -> Result<Vec<Self>, ProdError> {
         let rows = sqlx::query_as!(
             CampaignRow,
             r#"
@@ -75,14 +75,13 @@ impl CampaignController for CampaignModel {
 
         if rows.is_empty() {
             return Err(ProdError::NotFound(format!(
-                "No campaigns were found for advertiser - `{:?}`",
-                advertiser_id
+                "No campaigns were found for advertiser - `{advertiser_id:?}`",
             )));
         }
 
         let campaigns = paginate(rows, query.size, query.page)
             .into_iter()
-            .map(CampaignModel::from)
+            .map(Self::from)
             .collect();
 
         Ok(campaigns)
@@ -93,7 +92,7 @@ impl CampaignController for CampaignModel {
         advertiser_id: Uuid,
         campaign_id: Uuid,
         campaign: CampaignPatchForm,
-    ) -> Result<CampaignModel, ProdError> {
+    ) -> Result<Self, ProdError> {
         let CampaignPatchForm {
             cost_per_click,
             ad_title,
@@ -132,8 +131,7 @@ impl CampaignController for CampaignModel {
         .await
         .map_err(|err| match err {
             sqlx::Error::RowNotFound => ProdError::NotFound(format!(
-                "No campaign was found with id - `{:?}` for advertiser - `{:?}`",
-                campaign_id, advertiser_id
+                "No campaign was found with id - `{campaign_id:?}` for advertiser - `{advertiser_id:?}`",
             )),
             _ => ProdError::DatabaseError(err),
         })?;
@@ -145,7 +143,7 @@ impl CampaignController for CampaignModel {
         conn: &mut PgConnection,
         advertiser_id: Uuid,
         campaign_id: Uuid,
-    ) -> Result<CampaignModel, ProdError> {
+    ) -> Result<Self, ProdError> {
         let campaign = sqlx::query_as!(
             CampaignRow,
             r#"
@@ -162,8 +160,7 @@ impl CampaignController for CampaignModel {
         .await
         .map_err(|err| match err {
             sqlx::Error::RowNotFound => ProdError::NotFound(format!(
-                "No campaign was found with id - `{:?}` for advertiser - `{:?}`",
-                campaign_id, advertiser_id
+                "No campaign was found with id - `{campaign_id:?}` for advertiser - `{advertiser_id:?}`",
             )),
             _ => ProdError::DatabaseError(err),
         })?;
@@ -190,8 +187,7 @@ impl CampaignController for CampaignModel {
 
         if rows_affected.rows_affected() == 0 {
             return Err(ProdError::NotFound(format!(
-                "No campaign was found with id - `{:?}` for advertiser - `{:?}`",
-                campaign_id, advertiser_id
+                "No campaign was found with id - `{campaign_id:?}` for advertiser - `{advertiser_id:?}`",
             )));
         }
 

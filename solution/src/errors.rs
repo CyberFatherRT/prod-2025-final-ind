@@ -29,17 +29,18 @@ pub enum ProdError {
 
 impl From<ProdError> for Response<String> {
     fn from(prod_error: ProdError) -> Self {
-        let error = format!("{:?}", prod_error);
+        let error = format!("{prod_error:?}");
         let builder = Response::builder();
         match prod_error {
-            ProdError::InvalidRequest(_) => builder.status(StatusCode::BAD_REQUEST),
-            ProdError::AlreadyExists(_) => builder.status(StatusCode::BAD_REQUEST),
-            ProdError::DatabaseError(_) => builder.status(StatusCode::INTERNAL_SERVER_ERROR),
-            ProdError::RedisError(_) => builder.status(StatusCode::INTERNAL_SERVER_ERROR),
+            ProdError::AlreadyExists(_) | ProdError::InvalidRequest(_) => {
+                builder.status(StatusCode::BAD_REQUEST)
+            }
+            ProdError::RedisError(_) | ProdError::Unknown(_) | ProdError::DatabaseError(_) => {
+                builder.status(StatusCode::INTERNAL_SERVER_ERROR)
+            }
             ProdError::NotFound(_) => builder.status(StatusCode::NOT_FOUND),
-            ProdError::Unknown(_) => builder.status(StatusCode::INTERNAL_SERVER_ERROR),
         }
         .body(error)
-        .unwrap()
+        .expect("Failed to build response")
     }
 }

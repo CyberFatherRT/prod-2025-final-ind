@@ -24,7 +24,7 @@ impl ClientController for ClientModel {
     async fn bulk(
         conn: &mut PgConnection,
         clients: Vec<ClientForm>,
-    ) -> Result<Vec<ClientModel>, ProdError> {
+    ) -> Result<Vec<Self>, ProdError> {
         let _ = sqlx::query!(
             r#"
             INSERT INTO clients(id, login, age, location, gender)
@@ -45,14 +45,11 @@ impl ClientController for ClientModel {
         .await
         .map_err(ProdError::DatabaseError)?;
 
-        let clients = clients.iter().map(|x| x.into()).collect();
+        let clients = clients.iter().map(Into::into).collect();
         Ok(clients)
     }
 
-    async fn get_client_by_id(
-        conn: &mut PgConnection,
-        client_id: Uuid,
-    ) -> Result<ClientModel, ProdError> {
+    async fn get_client_by_id(conn: &mut PgConnection, client_id: Uuid) -> Result<Self, ProdError> {
         let client = sqlx::query_as!(
             ClientModel,
             r#"

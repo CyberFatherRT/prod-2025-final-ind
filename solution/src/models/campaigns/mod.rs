@@ -63,7 +63,7 @@ pub struct CampaignRow {
 
 impl From<CampaignRow> for CampaignModel {
     fn from(row: CampaignRow) -> Self {
-        CampaignModel {
+        Self {
             id: row.id,
             advertiser_id: row.advertiser_id,
             impressions_limit: row.impressions_limit,

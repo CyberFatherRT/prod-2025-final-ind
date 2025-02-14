@@ -23,7 +23,7 @@ pub struct ClientForm {
 
 impl From<&ClientForm> for ClientModel {
     fn from(value: &ClientForm) -> Self {
-        ClientModel {
+        Self {
             client_id: value.client_id,
             login: value.login.clone(),
             age: value.age,
@@ -36,8 +36,8 @@ impl From<&ClientForm> for ClientModel {
 impl From<ClientGenderForm> for ClientGenderModel {
     fn from(value: ClientGenderForm) -> Self {
         match value {
-            ClientGenderForm::Male => ClientGenderModel::Male,
-            ClientGenderForm::Female => ClientGenderModel::Female,
+            ClientGenderForm::Male => Self::Male,
+            ClientGenderForm::Female => Self::Female,
         }
     }
 }

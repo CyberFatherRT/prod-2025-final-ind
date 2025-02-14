@@ -4,7 +4,7 @@ use axum::{extract::Request, http::StatusCode, response::Response};
 use tracing::info;
 
 pub fn env(key: &str) -> String {
-    dotenvy::var(key).unwrap_or_else(|_| panic!("`{}` environment variable not found", key))
+    dotenvy::var(key).unwrap_or_else(|_| panic!("`{key}` environment variable not found"))
 }
 
 pub async fn log_request(
@@ -15,9 +15,9 @@ pub async fn log_request(
     let path = req.uri().path().to_string();
     let method = req.method().clone();
 
-    let res = next.run(req).await;
+    let response = next.run(req).await;
 
-    let status = res.status();
+    let status = response.status();
     let latency = start.elapsed();
 
     info!(
@@ -29,7 +29,7 @@ pub async fn log_request(
         "request"
     );
 
-    Ok(res)
+    Ok(response)
 }
 
 pub fn paginate<T: Clone>(items: Vec<T>, size: Option<usize>, page: Option<usize>) -> Vec<T> {

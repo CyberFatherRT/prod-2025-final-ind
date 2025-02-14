@@ -4,6 +4,8 @@ mod setup;
 
 #[tokio::test]
 async fn healthcheck() -> anyhow::Result<()> {
+    setup::init_tracing();
+
     let app = setup::get_app().await;
     let response = app
         .oneshot(

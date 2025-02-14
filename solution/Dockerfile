@@ -1,22 +1,20 @@
-FROM rust:1.84-slim-bullseye AS base
+FROM rust:1.84.1-alpine3.21 AS base
+RUN apk add --no-cache musl-dev openssl-dev openssl-libs-static pkgconfig
+RUN cargo install cargo-chef
+
 
 FROM base AS chef
 WORKDIR /app
-
-RUN cargo install cargo-chef
 RUN cargo init --name solution
-
 COPY Cargo.toml Cargo.lock ./
 RUN cargo chef prepare --recipe-path recipe.json
 
+
 FROM base AS planner
 WORKDIR /app
-
-RUN cargo install cargo-chef
 RUN cargo init --name solution
-
 COPY --from=chef /app/recipe.json recipe.json
-RUN cargo chef cook --release --recipe-path recipe.json
+RUN cargo chef cook --release --recipe-path recipe.json --target x86_64-unknown-linux-musl
 
 
 FROM base AS builder
@@ -30,11 +28,11 @@ COPY Cargo.toml Cargo.toml
 COPY --from=planner /app/target target
 COPY --from=planner /app/Cargo.lock Cargo.lock
 
-RUN cargo build --release
+RUN cargo build --release --target x86_64-unknown-linux-musl
 
 
-FROM gcr.io/distroless/cc-debian12 AS final
+FROM scratch AS final
 WORKDIR /app
-COPY --from=builder /app/target/release/solution solution
+COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/solution /app/solution
 ENTRYPOINT [ "/app/solution" ]
 

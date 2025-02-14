@@ -9,12 +9,14 @@ use testcontainers::{
     GenericImage, ImageExt,
 };
 use tokio::sync::OnceCell;
+use tracing::info;
 
 type Container = testcontainers::ContainerAsync<GenericImage>;
 
 static APP: OnceCell<Router> = OnceCell::const_new();
 
 async fn setup_postgres() -> anyhow::Result<(PgPool, Container)> {
+    info!("Setting up postgres");
     let postgres = GenericImage::new("postgres", "17.2-alpine3.21")
         .with_exposed_port(5432.tcp())
         .with_wait_for(WaitFor::message_on_stderr(
@@ -28,10 +30,14 @@ async fn setup_postgres() -> anyhow::Result<(PgPool, Container)> {
     let port = postgres.get_host_port_ipv4(5432).await?;
     let database_url = format!("postgres://postgres:password@localhost:{port}/postgres");
     let pool = PgPool::connect(&database_url).await?;
+    sqlx::migrate!("./migrations").run(&pool).await?;
+
+    info!("Postgres setup complete");
     Ok((pool, postgres))
 }
 
 async fn setup_redis() -> anyhow::Result<(RedisClient, Container)> {
+    info!("Setting up redis");
     let redis = GenericImage::new("redis", "7.2.7-alpine")
         .with_exposed_port(6379.tcp())
         .with_wait_for(WaitFor::message_on_stdout("Ready to accept connections"))
@@ -40,10 +46,12 @@ async fn setup_redis() -> anyhow::Result<(RedisClient, Container)> {
     let port = redis.get_host_port_ipv4(6379).await?;
     let redis_url = format!("redis://localhost:{}", port);
     let rclient = RedisClient::open(redis_url)?;
+    info!("Redis setup complete");
     Ok((rclient, redis))
 }
 
 async fn setup_s3() -> anyhow::Result<(Bucket, Container)> {
+    info!("Setting up minio");
     let s3 = GenericImage::new("bitnami/minio", "2025.2.7")
         .with_exposed_port(9000.tcp())
         .with_wait_for(WaitFor::message_on_stderr("API:"))
@@ -74,6 +82,7 @@ async fn setup_s3() -> anyhow::Result<(Bucket, Container)> {
         .bucket;
     }
 
+    info!("Minio setup complete");
     Ok((*bucket, s3))
 }
 
@@ -92,4 +101,12 @@ pub async fn get_app() -> Router {
     })
     .await
     .clone()
+}
+
+pub fn init_tracing() {
+    tracing_subscriber::fmt()
+        .compact()
+        .with_target(true)
+        .with_max_level(tracing::Level::INFO)
+        .init()
 }

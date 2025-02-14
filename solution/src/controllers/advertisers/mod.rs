@@ -26,7 +26,7 @@ impl AdvertiserContoller for AdvertiserModel {
     async fn bulk(
         conn: &mut PgConnection,
         advertisers: Vec<AdvertiserForm>,
-    ) -> Result<Vec<AdvertiserModel>, ProdError> {
+    ) -> Result<Vec<Self>, ProdError> {
         let _ = sqlx::query!(
             r#"
             INSERT INTO advertisers(id, name)
@@ -41,14 +41,14 @@ impl AdvertiserContoller for AdvertiserModel {
         .await
         .map_err(ProdError::DatabaseError)?;
 
-        let advertisers = advertisers.iter().map(|x| x.into()).collect();
+        let advertisers = advertisers.iter().map(Into::into).collect();
         Ok(advertisers)
     }
 
     async fn get_advertiser_by_id(
         conn: &mut PgConnection,
         advertiser_id: Uuid,
-    ) -> Result<AdvertiserModel, ProdError> {
+    ) -> Result<Self, ProdError> {
         let advertiser = sqlx::query_as!(
             AdvertiserModel,
             r#"
