@@ -11,7 +11,7 @@ pub async fn set_date(
 ) -> Result<Json<TimeModel>, Response<String>> {
     let mut rclient = state.rclient.conn().await?;
     let current_date: i32 = rclient
-        .set("date", date.current_date)
+        .set("date", date.current_date.unwrap_or(0))
         .await
         .map_err(ProdError::RedisError)?;
 

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        INSERT INTO clients(id, login, age, location, gender)\n        SELECT * FROM UNNEST($1::UUID[], $2::VARCHAR[], $3::INT[], $4::VARCHAR[], $5::GENDER[])\n        ",
+  "query": "\n            INSERT INTO clients(id, login, age, location, gender)\n            SELECT * FROM UNNEST($1::UUID[], $2::VARCHAR[], $3::INT[], $4::VARCHAR[], $5::GENDER[])\n            ON CONFLICT (id) DO UPDATE SET\n                login = EXCLUDED.login,\n                age = EXCLUDED.age,\n                location = EXCLUDED.location,\n                gender = EXCLUDED.gender\n            ",
   "describe": {
     "columns": [],
     "parameters": {
@@ -31,5 +31,5 @@
     },
     "nullable": []
   },
-  "hash": "557f907e4299b72bc1f134f3bb6e88402a74ca1d94bf1e0763aeab36e0293689"
+  "hash": "5c365bdc2c9764bc6ae4600ed9711f0f494490f0ed486b718ce0964d176cc8bd"
 }
