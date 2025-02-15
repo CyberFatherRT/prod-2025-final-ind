@@ -1,8 +1,4 @@
-use axum::{
-    http::StatusCode,
-    response::{IntoResponse, Response},
-    Json,
-};
+use axum::{http::StatusCode, response::IntoResponse, Json};
 
 #[derive(thiserror::Error, Debug)]
 pub enum ProdError {
@@ -22,11 +18,11 @@ pub enum ProdError {
     RedisError(#[from] redis::RedisError),
 
     /// Not found error
-    #[error("not found")]
+    #[error("{0}")]
     NotFound(String),
 
     /// Conflict Error
-    #[error("conflict")]
+    #[error("{0}")]
     Conflict(String),
 
     /// Forbidden Error
@@ -36,26 +32,6 @@ pub enum ProdError {
     /// Any other, unknown error sources.
     #[error("{0}")]
     Unknown(#[source] Box<dyn std::error::Error + Send + Sync>),
-}
-
-impl From<ProdError> for Response<String> {
-    fn from(prod_error: ProdError) -> Self {
-        let error = format!("{prod_error:?}");
-        let builder = Response::builder();
-        match prod_error {
-            ProdError::AlreadyExists(_) | ProdError::InvalidRequest(_) => {
-                builder.status(StatusCode::BAD_REQUEST)
-            }
-            ProdError::RedisError(_) | ProdError::Unknown(_) | ProdError::DatabaseError(_) => {
-                builder.status(StatusCode::INTERNAL_SERVER_ERROR)
-            }
-            ProdError::Forbidden(_) => builder.status(StatusCode::FORBIDDEN),
-            ProdError::Conflict(_) => builder.status(StatusCode::CONFLICT),
-            ProdError::NotFound(_) => builder.status(StatusCode::NOT_FOUND),
-        }
-        .body(error)
-        .expect("Failed to build response")
-    }
 }
 
 impl IntoResponse for ProdError {

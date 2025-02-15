@@ -1,6 +1,5 @@
 use axum::{
     extract::{Path, Query, State},
-    response::Response,
     Json,
 };
 use redis::AsyncCommands;
@@ -8,6 +7,7 @@ use uuid::Uuid;
 
 use crate::{
     db::Rclient,
+    errors::ProdError,
     forms::advertisement::{AdvertisementForm, AdvertisementQuery},
     models::advertisement::{AdModelController, AdvertisementModel},
     AppState,
@@ -16,7 +16,7 @@ use crate::{
 pub async fn get_ad(
     State(state): State<AppState>,
     Query(query): Query<AdvertisementQuery>,
-) -> Result<Json<AdvertisementModel>, Response<String>> {
+) -> Result<Json<AdvertisementModel>, ProdError> {
     let mut rclient = state.rclient.conn().await?;
     let date = rclient.get("date").await.unwrap_or(0);
     let AdvertisementQuery { client_id } = query;
@@ -29,7 +29,7 @@ pub async fn click_ad(
     State(state): State<AppState>,
     Path(campaign_id): Path<Uuid>,
     Json(body): Json<AdvertisementForm>,
-) -> Result<(), Response<String>> {
+) -> Result<(), ProdError> {
     let mut rclient = state.rclient.conn().await?;
     let date = rclient.get("date").await.unwrap_or(0);
     let AdvertisementForm { client_id } = body;

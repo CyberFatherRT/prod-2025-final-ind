@@ -1,7 +1,6 @@
 use axum::{
     extract::{Path, State},
     http::StatusCode,
-    response::Response,
     Json,
 };
 use validator::Validate;
@@ -18,7 +17,7 @@ use crate::{
 pub async fn bulk(
     State(state): State<AppState>,
     Json(advertisers): Json<Vec<AdvertiserForm>>,
-) -> Result<(StatusCode, Json<Vec<AdvertiserModel>>), Response<String>> {
+) -> Result<(StatusCode, Json<Vec<AdvertiserModel>>), ProdError> {
     advertisers.validate().map_err(ProdError::InvalidRequest)?;
 
     let mut conn = state.pool.conn().await?;
@@ -30,7 +29,7 @@ pub async fn bulk(
 pub async fn get_advertiser_by_id(
     State(state): State<AppState>,
     Path(advertiser_id): Path<uuid::Uuid>,
-) -> Result<(StatusCode, Json<AdvertiserModel>), Response<String>> {
+) -> Result<(StatusCode, Json<AdvertiserModel>), ProdError> {
     let mut conn = state.pool.conn().await?;
     let advertiser = AdvertiserModel::get_advertiser_by_id(&mut conn, advertiser_id).await?;
 
@@ -40,7 +39,7 @@ pub async fn get_advertiser_by_id(
 pub async fn ml_scores(
     State(state): State<AppState>,
     Json(ml_score): Json<MlScoreForm>,
-) -> Result<StatusCode, Response<String>> {
+) -> Result<StatusCode, ProdError> {
     let mut conn = state.pool.conn().await?;
     AdvertiserModel::ml_scores(&mut conn, ml_score).await?;
 

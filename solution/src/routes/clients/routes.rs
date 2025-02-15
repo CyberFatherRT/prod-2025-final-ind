@@ -1,7 +1,6 @@
 use axum::{
     extract::{Path, State},
     http::StatusCode,
-    response::Response,
     Json,
 };
 use validator::Validate;
@@ -14,7 +13,7 @@ use crate::{
 pub async fn bulk(
     State(state): State<AppState>,
     Json(clients): Json<Vec<ClientForm>>,
-) -> Result<(StatusCode, Json<Vec<ClientModel>>), Response<String>> {
+) -> Result<(StatusCode, Json<Vec<ClientModel>>), ProdError> {
     clients.validate().map_err(ProdError::InvalidRequest)?;
 
     let mut conn = state.pool.conn().await?;
@@ -26,7 +25,7 @@ pub async fn bulk(
 pub async fn get_client_by_id(
     State(state): State<AppState>,
     Path(client_id): Path<uuid::Uuid>,
-) -> Result<(StatusCode, Json<ClientModel>), Response<String>> {
+) -> Result<(StatusCode, Json<ClientModel>), ProdError> {
     let mut conn = state.pool.conn().await?;
     let client = ClientModel::get_client_by_id(&mut conn, client_id).await?;
 

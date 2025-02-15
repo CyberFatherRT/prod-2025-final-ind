@@ -1,7 +1,6 @@
 use axum::{
     extract::{Path, Query, State},
     http::StatusCode,
-    response::Response,
     Json,
 };
 use tokio::try_join;
@@ -39,7 +38,7 @@ pub async fn list(
     State(state): State<AppState>,
     Path(advertiser_id): Path<Uuid>,
     Query(query): Query<CampaignQuery>,
-) -> Result<Json<Vec<CampaignModel>>, Response<String>> {
+) -> Result<Json<Vec<CampaignModel>>, ProdError> {
     let mut conn = state.pool.conn().await?;
     let campaigns = CampaignModel::list(&mut conn, advertiser_id, query).await?;
 
@@ -50,7 +49,7 @@ pub async fn update(
     State(state): State<AppState>,
     Path((advertiser_id, campaign_id)): Path<(Uuid, Uuid)>,
     Json(campaign): Json<CampaignPatchForm>,
-) -> Result<Json<CampaignModel>, Response<String>> {
+) -> Result<Json<CampaignModel>, ProdError> {
     let mut conn = state.pool.conn().await?;
     let campaing = CampaignModel::update(&mut conn, advertiser_id, campaign_id, campaign).await?;
 
@@ -60,7 +59,7 @@ pub async fn update(
 pub async fn get_campaign_by_id(
     State(state): State<AppState>,
     Path((advertiser_id, campaign_id)): Path<(Uuid, Uuid)>,
-) -> Result<Json<CampaignModel>, Response<String>> {
+) -> Result<Json<CampaignModel>, ProdError> {
     let mut conn = state.pool.conn().await?;
     let campaign = CampaignModel::get(&mut conn, advertiser_id, campaign_id).await?;
 
@@ -70,7 +69,7 @@ pub async fn get_campaign_by_id(
 pub async fn delete_campaign(
     State(state): State<AppState>,
     Path((advertiser_id, campaign_id)): Path<(Uuid, Uuid)>,
-) -> Result<StatusCode, Response<String>> {
+) -> Result<StatusCode, ProdError> {
     let mut conn = state.pool.conn().await?;
     CampaignModel::delete(&mut conn, advertiser_id, campaign_id).await?;
 

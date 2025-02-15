@@ -1,4 +1,4 @@
-use axum::{extract::State, response::Response, Json};
+use axum::{extract::State, Json};
 use redis::AsyncCommands;
 
 use crate::{
@@ -8,7 +8,7 @@ use crate::{
 pub async fn set_date(
     State(state): State<AppState>,
     Json(date): Json<TimeForm>,
-) -> Result<Json<TimeModel>, Response<String>> {
+) -> Result<Json<TimeModel>, ProdError> {
     let mut rclient = state.rclient.conn().await?;
     let current_date: i32 = rclient
         .set("date", date.current_date.unwrap_or(0))
