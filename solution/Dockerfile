@@ -32,9 +32,12 @@ COPY --from=planner /app/Cargo.lock Cargo.lock
 
 RUN cargo build --release --target x86_64-unknown-linux-musl
 
+FROM alpine AS certificates
+RUN apk add --no-cache ca-certificates
 
-FROM alpine AS final
+FROM busybox:musl AS final
 WORKDIR /app
 COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/solution /app/solution
+COPY --from=certificates /etc/ssl/certs /etc/ssl/certs
 ENTRYPOINT [ "/app/solution" ]
 
