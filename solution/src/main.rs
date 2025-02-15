@@ -21,7 +21,7 @@ async fn main() -> anyhow::Result<()> {
     sqlx::migrate!("./migrations").run(&pool).await?;
 
     let rclient = redis::Client::open(redis_url)?;
-    let s3 = setup_s3().await?;
+    let s3 = setup_s3().await;
     let app_state = AppState { pool, rclient, s3 };
 
     let addr = format!("0.0.0.0:{}", port);

@@ -12,9 +12,8 @@ use axum::{
     Router,
 };
 use routes::{advertisement, advertisers, clients, statistics, time};
-use s3::Bucket;
 use sqlx::PgPool;
-use utils::log_request;
+use utils::{change_status_code, log_request};
 
 pub mod controllers;
 pub mod db;
@@ -30,7 +29,7 @@ pub mod utils;
 pub struct AppState {
     pub pool: PgPool,
     pub rclient: redis::Client,
-    pub s3: Bucket,
+    pub s3: aws_sdk_s3::Client,
 }
 
 pub fn app(state: AppState) -> Router {
@@ -44,6 +43,7 @@ pub fn app(state: AppState) -> Router {
             .nest("/ads", advertisement::get_routes())
             .nest("/stats", statistics::get_routes())
             .nest("/time", time::get_routes())
+            .layer(from_fn(change_status_code))
             .layer(from_fn(log_request))
             .with_state(state),
     )

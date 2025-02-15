@@ -7,6 +7,7 @@ FROM base AS chef
 WORKDIR /app
 RUN cargo init --name solution
 COPY Cargo.toml Cargo.lock ./
+RUN sed -i '/\[\[test\]\]/,/^$/d' Cargo.toml
 RUN cargo chef prepare --recipe-path recipe.json
 
 
@@ -23,6 +24,7 @@ WORKDIR /app
 COPY .sqlx .sqlx
 COPY migrations migrations
 COPY src src
+COPY tests tests
 COPY Cargo.toml Cargo.toml
 
 COPY --from=planner /app/target target
@@ -31,7 +33,7 @@ COPY --from=planner /app/Cargo.lock Cargo.lock
 RUN cargo build --release --target x86_64-unknown-linux-musl
 
 
-FROM scratch AS final
+FROM alpine AS final
 WORKDIR /app
 COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/solution /app/solution
 ENTRYPOINT [ "/app/solution" ]

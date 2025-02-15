@@ -2,14 +2,16 @@ services:
   solution:
     build: .
     image: solution
+    ports:
+      - 8080:8080
     environment:
       - PORT=8080
       - REDIS_URL=redis://redis:6379
       - DATABASE_URL=postgres://postgres:password@db:5432/prod
-      - MINIO_BUCKET_NAME=prod
+      - BUCKET_NAME=prod
       - MINIO_ENDPOINT=http://s3:9000
-      - MINIO_ACCESS_KEY_ID=ZZxdWf3Q4Gu7Wk3hklOGDDYg
-      - MINIO_SECRET_ACCESS_KEY=ZZ9ko24AA4OBk9nJTCRmQChHHnkxLVQ3kec6EebA
+      - AWS_ACCESS_KEY_ID=ZZxdWf3Q4Gu7Wk3hklOGDDYg
+      - AWS_SECRET_ACCESS_KEY=ZZ9ko24AA4OBk9nJTCRmQChHHnkxLVQ3kec6EebA
     depends_on:
       - s3
       - db

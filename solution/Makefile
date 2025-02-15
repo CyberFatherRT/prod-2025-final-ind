@@ -37,5 +37,5 @@ down:
 
 .PHONY: ps
 ps:
-	@echo "Showing logs..."
+	@echo "Showing running containers..."
 	@${DOCKER} compose ps -a

@@ -32,6 +32,19 @@ pub async fn log_request(
     Ok(response)
 }
 
+pub async fn change_status_code(
+    req: Request,
+    next: axum::middleware::Next,
+) -> Result<Response, StatusCode> {
+    let mut response = next.run(req).await;
+
+    if response.status() == StatusCode::UNPROCESSABLE_ENTITY {
+        *response.status_mut() = StatusCode::BAD_REQUEST;
+    }
+
+    Ok(response)
+}
+
 pub fn paginate<T: Clone>(items: Vec<T>, size: Option<usize>, page: Option<usize>) -> Vec<T> {
     let total_items = items.len();
     let size = size.unwrap_or(total_items);
