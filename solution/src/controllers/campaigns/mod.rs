@@ -65,7 +65,7 @@ impl CampaignController for CampaignModel {
                    cost_per_click, ad_title, ad_text, start_date, end_date,
                    gender as "gender: CampaignGenderModel", age_from, age_to, location
             FROM campaigns
-            WHERE advertiser_id = $1
+            WHERE advertiser_id = $1 AND is_deleted = false
             "#,
             advertiser_id
         )
@@ -111,7 +111,7 @@ impl CampaignController for CampaignModel {
                 age_from = COALESCE($5, age_from),
                 age_to = COALESCE($6, age_to),
                 location = COALESCE($7, location)
-            WHERE advertiser_id = $8 AND id = $9
+            WHERE advertiser_id = $8 AND id = $9 AND is_deleted = false
             RETURNING id, advertiser_id, impressions_limit, clicks_limit, cost_per_impression,
                       cost_per_click, ad_title, ad_text, start_date, end_date,
                       gender AS "gender: CampaignGenderModel",
@@ -151,7 +151,7 @@ impl CampaignController for CampaignModel {
                    cost_per_click, ad_title, ad_text, start_date, end_date,
                    gender as "gender: CampaignGenderModel", age_from, age_to, location
             FROM campaigns
-            WHERE advertiser_id = $1 AND id = $2
+            WHERE advertiser_id = $1 AND id = $2 AND is_deleted = false
             "#,
             advertiser_id,
             campaign_id
@@ -175,7 +175,8 @@ impl CampaignController for CampaignModel {
     ) -> Result<(), ProdError> {
         let rows_affected = sqlx::query!(
             r#"
-            DELETE FROM campaigns
+            UPDATE campaigns
+            SET is_deleted = true
             WHERE advertiser_id = $1 AND id = $2
             "#,
             advertiser_id,

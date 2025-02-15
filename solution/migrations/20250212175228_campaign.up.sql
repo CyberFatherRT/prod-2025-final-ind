@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS campaigns
     age_from            INT,
     age_to              INT,
     location            TEXT,
+    is_deleted          BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (advertiser_id) REFERENCES advertisers (id)
 );
 

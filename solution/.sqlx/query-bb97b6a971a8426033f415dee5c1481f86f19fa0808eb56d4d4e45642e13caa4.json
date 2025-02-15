@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT id, advertiser_id, impressions_limit, clicks_limit, cost_per_impression,\n                   cost_per_click, ad_title, ad_text, start_date, end_date,\n                   gender as \"gender: CampaignGenderModel\", age_from, age_to, location\n            FROM campaigns\n            WHERE advertiser_id = $1\n            ",
+  "query": "\n            SELECT id, advertiser_id, impressions_limit, clicks_limit, cost_per_impression,\n                   cost_per_click, ad_title, ad_text, start_date, end_date,\n                   gender as \"gender: CampaignGenderModel\", age_from, age_to, location\n            FROM campaigns\n            WHERE advertiser_id = $1 AND is_deleted = false\n            ",
   "describe": {
     "columns": [
       {
@@ -107,5 +107,5 @@
       true
     ]
   },
-  "hash": "e3faee06ee9db201ad613403312a5d704492eb30171fcdd9780cf279563c1dd0"
+  "hash": "bb97b6a971a8426033f415dee5c1481f86f19fa0808eb56d4d4e45642e13caa4"
 }

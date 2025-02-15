@@ -1,4 +1,4 @@
-use solution::{app, minio::setup_s3, utils::env, AppState};
+use solution::{app, services::setup_s3, utils::env, AppState};
 use sqlx::PgPool;
 use tokio::net::TcpListener;
 use tracing::Level;

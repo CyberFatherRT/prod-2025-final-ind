@@ -70,8 +70,10 @@ impl AdModelController for AdvertisementModel {
         let _ = sqlx::query!(
             r#"
             INSERT INTO ad_clicks(client_id, campaign_id, advertiser_id, click_date)
-            SELECT $1, $2, advertiser_id, $3 FROM campaigns WHERE id = $2
-            ON CONFLICT DO NOTHING
+            SELECT $1, $2, c.advertiser_id, $3
+            FROM campaigns c
+            JOIN ad_impressions ai ON ai.campaign_id = c.id
+            WHERE id = $2 AND c.is_deleted = false
             "#,
             client_id,
             campaign_id,
@@ -79,7 +81,15 @@ impl AdModelController for AdvertisementModel {
         )
         .execute(&mut *conn)
         .await
-        .map_err(ProdError::DatabaseError)?;
+        .map_err(|err| match err {
+            sqlx::Error::Database(err) if err.is_foreign_key_violation() => ProdError::NotFound(
+                "Client does not have an impression for this campaign".to_string(),
+            ),
+            sqlx::Error::Database(err) if err.is_unique_violation() => {
+                ProdError::Conflict("Client has already clicked this ad".to_string())
+            }
+            _ => ProdError::DatabaseError(err),
+        })?;
 
         Ok(())
     }

@@ -61,7 +61,7 @@ BEGIN
             FROM ad_clicks
             GROUP BY campaign_id
         ) ac ON ac.campaign_id = c.id
-        WHERE p_current_date BETWEEN c.start_date AND c.end_date
+        WHERE p_current_date BETWEEN c.start_date AND c.end_date AND c.is_deleted = false
     ),
     computed AS (
         SELECT

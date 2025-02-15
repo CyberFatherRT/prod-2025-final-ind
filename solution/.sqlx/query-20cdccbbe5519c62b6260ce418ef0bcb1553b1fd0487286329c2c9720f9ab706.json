@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE campaigns\n            SET is_deleted = true\n            WHERE advertiser_id = $1 AND id = $2\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "20cdccbbe5519c62b6260ce418ef0bcb1553b1fd0487286329c2c9720f9ab706"
+}

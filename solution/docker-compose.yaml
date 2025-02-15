@@ -12,6 +12,8 @@ services:
       - MINIO_ENDPOINT=http://s3:9000
       - AWS_ACCESS_KEY_ID=ZZxdWf3Q4Gu7Wk3hklOGDDYg
       - AWS_SECRET_ACCESS_KEY=ZZ9ko24AA4OBk9nJTCRmQChHHnkxLVQ3kec6EebA
+      - YANDEX_API_KEY=AQVNxrJLPoWtwQNQd3FgCjtbFJNS-usTfAtfrLyJ
+      - YANDEX_FOLDER_ID=b1gip8uabjl2lsd3vfbf
     depends_on:
       - s3
       - db

@@ -20,9 +20,9 @@ pub mod db;
 pub mod errors;
 pub mod forms;
 pub mod macros;
-pub mod minio;
 pub mod models;
 pub mod routes;
+pub mod services;
 pub mod utils;
 
 #[derive(Clone)]

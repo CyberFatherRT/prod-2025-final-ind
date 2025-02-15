@@ -4,6 +4,7 @@ use axum::{
     response::Response,
     Json,
 };
+use tokio::try_join;
 use uuid::Uuid;
 use validator::Validate;
 
@@ -11,8 +12,8 @@ use crate::{
     db::Db,
     errors::ProdError,
     forms::campaigns::{CampaignForm, CampaignPatchForm, CampaignQuery},
-    models::campaigns::CampaignController,
-    models::campaigns::CampaignModel,
+    models::campaigns::{CampaignController, CampaignModel},
+    services::llm::llm_validate,
     AppState,
 };
 
@@ -20,8 +21,14 @@ pub async fn create(
     State(state): State<AppState>,
     Path(advertiser_id): Path<Uuid>,
     Json(campaign): Json<CampaignForm>,
-) -> Result<(StatusCode, Json<CampaignModel>), Response<String>> {
+) -> Result<(StatusCode, Json<CampaignModel>), ProdError> {
     campaign.validate().map_err(ProdError::InvalidRequest)?;
+
+    try_join!(
+        llm_validate(&campaign.ad_title),
+        llm_validate(&campaign.ad_text)
+    )?;
+
     let mut conn = state.pool.conn().await?;
     let campaign = CampaignModel::create(&mut conn, advertiser_id, campaign).await?;
 
