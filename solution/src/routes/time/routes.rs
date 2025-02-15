@@ -5,12 +5,21 @@ use crate::{
     db::Rclient, errors::ProdError, forms::time::TimeForm, models::time::TimeModel, AppState,
 };
 
+/// Set the current date
+#[utoipa::path(
+    post,
+    tag = "Time",
+    path = "/time/advance",
+    responses(
+        (status = 200, body = TimeModel)
+    )
+)]
 pub async fn set_date(
     State(state): State<AppState>,
     Json(date): Json<TimeForm>,
 ) -> Result<Json<TimeModel>, ProdError> {
     let mut rclient = state.rclient.conn().await?;
-    let current_date: i32 = rclient
+    let current_date = rclient
         .set("date", date.current_date.unwrap_or(0))
         .await
         .map_err(ProdError::RedisError)?;

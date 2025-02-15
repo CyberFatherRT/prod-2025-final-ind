@@ -16,6 +16,19 @@ use crate::{
     AppState,
 };
 
+/// Create a new advertisement campaign
+#[utoipa::path(
+    post,
+    tag = "Campaigns",
+    path = "/advertisers/{advertiser_id}/campaigns",
+    responses(
+        (status = 201, body = CampaignModel),
+        (status = 400,  description = "Invalid request")
+    ),
+    params(
+        ("advertiser_id" = uuid::Uuid, Path, description = "Advertiser ID"),
+    )
+)]
 pub async fn create(
     State(state): State<AppState>,
     Path(advertiser_id): Path<Uuid>,
@@ -34,6 +47,22 @@ pub async fn create(
     Ok((StatusCode::CREATED, Json(campaign)))
 }
 
+/// List all advertisement campaigns with pagination
+#[utoipa::path(
+    get,
+    tag = "Campaigns",
+    path = "/advertisers/{advertiser_id}/campaigns",
+    responses(
+        (status = 200, body = Vec<CampaignModel>),
+        (status = 400,  description = "Invalid request"),
+        (status = 404,  description = "Campaigns not found")
+    ),
+    params(
+        ("advertiser_id" = uuid::Uuid, Path, description = "Advertiser ID"),
+        ("size" = usize, Query, description = "Number of items per page"),
+        ("page" = usize, Query, description = "Page number"),
+    )
+)]
 pub async fn list(
     State(state): State<AppState>,
     Path(advertiser_id): Path<Uuid>,
@@ -45,6 +74,21 @@ pub async fn list(
     Ok(Json(campaigns))
 }
 
+/// Update an advertisement campaign by ID
+#[utoipa::path(
+    put,
+    tag = "Campaigns",
+    path = "/advertisers/{advertiser_id}/campaigns/{campaign_id}",
+    responses(
+        (status = 200, body = CampaignModel),
+        (status = 400, description = "Invalid request"),
+        (status = 404, description = "Campaign not found")
+    ),
+    params(
+        ("advertiser_id" = uuid::Uuid, Path, description = "Advertiser ID"),
+        ("campaign_id" = uuid::Uuid, Path, description = "Campaign ID"),
+    )
+)]
 pub async fn update(
     State(state): State<AppState>,
     Path((advertiser_id, campaign_id)): Path<(Uuid, Uuid)>,
@@ -56,6 +100,21 @@ pub async fn update(
     Ok(Json(campaing))
 }
 
+/// Get an advertisement campaign by ID
+#[utoipa::path(
+    get,
+    tag = "Campaigns",
+    path = "/advertisers/{advertiser_id}/campaigns/{campaign_id}",
+    responses(
+        (status = 200, body = CampaignModel),
+        (status = 400,  description = "Invalid request"),
+        (status = 404,  description = "Campaign not found")
+    ),
+    params(
+        ("advertiser_id" = uuid::Uuid, Path, description = "Advertiser ID"),
+        ("campaign_id" = uuid::Uuid, Path, description = "Campaign ID"),
+    )
+)]
 pub async fn get_campaign_by_id(
     State(state): State<AppState>,
     Path((advertiser_id, campaign_id)): Path<(Uuid, Uuid)>,
@@ -66,6 +125,21 @@ pub async fn get_campaign_by_id(
     Ok(Json(campaign))
 }
 
+/// Delete an advertisement campaign by ID
+#[utoipa::path(
+    delete,
+    tag = "Campaigns",
+    path = "/advertisers/{advertiser_id}/campaigns/{campaign_id}",
+    responses(
+        (status = 204, body = ()),
+        (status = 400,  description = "Invalid request"),
+        (status = 404,  description = "Campaign not found")
+    ),
+    params(
+        ("advertiser_id" = uuid::Uuid, Path, description = "Advertiser ID"),
+        ("campaign_id" = uuid::Uuid, Path, description = "Campaign ID"),
+    )
+)]
 pub async fn delete_campaign(
     State(state): State<AppState>,
     Path((advertiser_id, campaign_id)): Path<(Uuid, Uuid)>,

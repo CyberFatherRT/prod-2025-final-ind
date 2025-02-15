@@ -13,6 +13,19 @@ use crate::{
     AppState,
 };
 
+/// Get advertisement for a client
+#[utoipa::path(
+    get,
+    tag = "Ads",
+    path = "/ads",
+    responses(
+        (status = 200, body = AdvertisementModel),
+        (status = 404, description = "No advertisement found")
+    ),
+    params(
+        ("client_id" = Uuid, Query, description = "Client ID"),
+    )
+)]
 pub async fn get_ad(
     State(state): State<AppState>,
     Query(query): Query<AdvertisementQuery>,
@@ -25,6 +38,19 @@ pub async fn get_ad(
     Ok(Json(advertisement))
 }
 
+/// Recording a click on an ad
+#[utoipa::path(
+    post,
+    tag = "Ads",
+    path = "/ads/{campaign_id}/click",
+    responses(
+        (status = 200),
+        (status = 404, description = "No advertisement found or client did not see the ad")
+    ),
+    params(
+        ("campaign_id" = Uuid, Path, description = "Campaign ID"),
+    )
+)]
 pub async fn click_ad(
     State(state): State<AppState>,
     Path(campaign_id): Path<Uuid>,

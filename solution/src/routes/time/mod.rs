@@ -1,4 +1,4 @@
-mod routes;
+pub mod routes;
 
 use axum::{routing::post, Router};
 use routes::set_date;

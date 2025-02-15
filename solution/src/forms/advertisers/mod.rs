@@ -1,17 +1,18 @@
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 use uuid::Uuid;
 use validator::Validate;
 
 use crate::models::advertisers::{AdvertiserModel, MlScoreModel};
 
-#[derive(Validate, Serialize, Deserialize, sqlx::FromRow)]
+#[derive(Validate, Serialize, Deserialize, sqlx::FromRow, ToSchema)]
 pub struct AdvertiserForm {
     #[serde(rename = "advertiser_id")]
     pub id: Uuid,
     pub name: String,
 }
 
-#[derive(Validate, Serialize, Deserialize, sqlx::FromRow)]
+#[derive(Validate, Serialize, Deserialize, sqlx::FromRow, ToSchema)]
 pub struct MlScoreForm {
     pub client_id: Uuid,
     pub advertiser_id: Uuid,

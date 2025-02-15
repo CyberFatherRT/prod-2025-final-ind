@@ -1,8 +1,9 @@
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::Type;
+use utoipa::ToSchema;
 use validator::Validate;
 
-#[derive(Serialize, Deserialize, Type)]
+#[derive(Serialize, Deserialize, Type, ToSchema)]
 #[sqlx(type_name = "CAMPAIGN_GENDER", rename_all = "UPPERCASE")]
 #[serde(rename_all = "UPPERCASE")]
 pub enum CampaignGenderForm {
@@ -11,7 +12,7 @@ pub enum CampaignGenderForm {
     All,
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Default, Serialize, Deserialize, ToSchema)]
 pub struct TargetForm {
     pub gender: Option<CampaignGenderForm>,
     pub age_from: Option<i32>,
@@ -28,7 +29,7 @@ impl Validate for TargetForm {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, ToSchema)]
 pub struct CampaignForm {
     pub impressions_limit: i32,
     pub clicks_limit: i32,
@@ -55,7 +56,7 @@ impl Validate for CampaignForm {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, ToSchema)]
 pub struct CampaignPatchForm {
     pub cost_per_click: f64,
     pub ad_title: String,

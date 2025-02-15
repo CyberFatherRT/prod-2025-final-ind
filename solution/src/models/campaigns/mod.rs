@@ -3,6 +3,7 @@ use sqlx::{
     prelude::{FromRow, Type},
     PgConnection,
 };
+use utoipa::ToSchema;
 use uuid::Uuid;
 
 use crate::{
@@ -10,7 +11,7 @@ use crate::{
     forms::campaigns::{CampaignForm, CampaignPatchForm, CampaignQuery},
 };
 
-#[derive(Debug, Serialize, Deserialize, Type, Clone)]
+#[derive(Debug, Serialize, Deserialize, Type, Clone, ToSchema)]
 #[sqlx(type_name = "CAMPAIGN_GENDER", rename_all = "UPPERCASE")]
 #[serde(rename_all = "UPPERCASE")]
 pub enum CampaignGenderModel {
@@ -19,7 +20,7 @@ pub enum CampaignGenderModel {
     Any,
 }
 
-#[derive(Debug, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Serialize, Deserialize, FromRow, ToSchema)]
 pub struct CampaignTargetModel {
     pub gender: Option<CampaignGenderModel>,
     pub age_from: Option<i32>,
@@ -27,7 +28,7 @@ pub struct CampaignTargetModel {
     pub location: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct CampaignModel {
     #[serde(rename = "campaign_id")]
     pub id: Uuid,

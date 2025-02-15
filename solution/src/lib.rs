@@ -21,6 +21,8 @@ pub mod errors;
 pub mod forms;
 pub mod macros;
 pub mod models;
+#[cfg(debug_assertions)]
+pub mod openapi;
 pub mod routes;
 pub mod services;
 pub mod utils;

@@ -14,6 +14,19 @@ use crate::{
     AppState,
 };
 
+/// Get campaign statistics
+#[utoipa::path(
+    get,
+    tag = "Statistics",
+    path = "/stats/campaigns/{campaign_id}",
+    responses(
+        (status = 200, body = StatisticsModel),
+        (status = 404,  description = "Campaign not found")
+    ),
+    params(
+        ("campaign_id" = Uuid, Path, description = "Campaign ID"),
+    )
+)]
 pub async fn get_campaign_statistics(
     State(state): State<AppState>,
     Path(campaign_id): Path<Uuid>,
@@ -24,6 +37,19 @@ pub async fn get_campaign_statistics(
     Ok(Json(campaign_statistics))
 }
 
+/// Get agregated statistics for all campaigns of an advertiser
+#[utoipa::path(
+    get,
+    tag = "Statistics",
+    path = "/stats/advertiser/{advertiser_id}/campaigns",
+    responses(
+        (status = 200, body = StatisticsModel),
+        (status = 404,  description = "Advertiser not found")
+    ),
+    params(
+        ("advertiser_id" = Uuid, Path, description = "Advertiser ID"),
+    )
+)]
 pub async fn get_advertiser_statistics(
     State(state): State<AppState>,
     Path(advertiser_id): Path<Uuid>,
@@ -35,6 +61,19 @@ pub async fn get_advertiser_statistics(
     Ok(Json(advertiser_statistics))
 }
 
+/// Get daily statistics for a campaign
+#[utoipa::path(
+    get,
+    tag = "Statistics",
+    path = "/stats/campaigns/{campaign_id}/daily",
+    responses(
+        (status = 200, body = Vec<DailyStatisticsModel>),
+        (status = 404,  description = "Campaign not found")
+    ),
+    params(
+        ("campaign_id" = Uuid, Path, description = "Campaign ID"),
+    )
+)]
 pub async fn get_campaign_daily_statistics(
     State(state): State<AppState>,
     Path(campaign_id): Path<Uuid>,
@@ -46,6 +85,19 @@ pub async fn get_campaign_daily_statistics(
     Ok(Json(campaign_daily_statistics))
 }
 
+/// Get daily statistics for all campaigns of an advertiser
+#[utoipa::path(
+    get,
+    tag = "Statistics",
+    path = "/stats/advertiser/{advertiser_id}/campaigns/daily",
+    responses(
+        (status = 200, body = Vec<DailyStatisticsModel>),
+        (status = 404,  description = "Advertiser not found")
+    ),
+    params(
+        ("advertiser_id" = Uuid, Path, description = "Advertiser ID"),
+    )
+)]
 pub async fn get_advertiser_daily_statistics(
     State(state): State<AppState>,
     Path(advertiser_id): Path<Uuid>,

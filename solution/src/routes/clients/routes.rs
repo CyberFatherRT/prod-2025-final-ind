@@ -10,6 +10,16 @@ use crate::{
     models::clients::ClientModel, AppState,
 };
 
+/// Bulk insert/update of clients
+#[utoipa::path(
+    post,
+    tag = "Clients",
+    path = "/clients/bulk",
+    responses(
+        (status = 201, body = Vec<ClientModel>),
+        (status = 400,  description = "Invalid request")
+    ),
+)]
 pub async fn bulk(
     State(state): State<AppState>,
     Json(clients): Json<Vec<ClientForm>>,
@@ -22,6 +32,19 @@ pub async fn bulk(
     Ok((StatusCode::CREATED, Json(clients)))
 }
 
+/// Get client by ID
+#[utoipa::path(
+    get,
+    tag = "Clients",
+    path = "/clients/{client_id}",
+    responses(
+        (status = 201, body = ClientModel),
+        (status = 400,  description = "Invalid request")
+    ),
+    params(
+        ("client_id" = uuid::Uuid, Path, description = "Client ID"),
+    )
+)]
 pub async fn get_client_by_id(
     State(state): State<AppState>,
     Path(client_id): Path<uuid::Uuid>,

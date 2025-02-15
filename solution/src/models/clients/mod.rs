@@ -1,8 +1,9 @@
 use serde::{Deserialize, Serialize};
 use sqlx::Type;
+use utoipa::ToSchema;
 use validator::Validate;
 
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, Type)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, Type, ToSchema)]
 #[sqlx(type_name = "GENDER", rename_all = "UPPERCASE")]
 #[serde(rename_all = "UPPERCASE")]
 pub enum ClientGenderModel {
@@ -10,7 +11,7 @@ pub enum ClientGenderModel {
     Female,
 }
 
-#[derive(Validate, Serialize, Deserialize, sqlx::FromRow)]
+#[derive(Validate, Serialize, Deserialize, sqlx::FromRow, ToSchema)]
 pub struct ClientModel {
     pub client_id: uuid::Uuid,
     pub login: String,

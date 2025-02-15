@@ -14,6 +14,16 @@ use crate::{
     AppState,
 };
 
+/// Bulk insert/update of advertisers
+#[utoipa::path(
+    post,
+    tag = "Advertisers",
+    path = "/advertisers/bulk",
+    responses(
+        (status = 201, body = Vec<AdvertiserModel>),
+        (status = 400,  description = "Invalid request")
+    ),
+)]
 pub async fn bulk(
     State(state): State<AppState>,
     Json(advertisers): Json<Vec<AdvertiserForm>>,
@@ -26,6 +36,19 @@ pub async fn bulk(
     Ok((StatusCode::CREATED, Json(advertisers)))
 }
 
+/// Get advertiser by ID
+#[utoipa::path(
+    get,
+    tag = "Advertisers",
+    path = "/advertisers/{advertiser_id}",
+    responses(
+        (status = 201, body = AdvertiserModel),
+        (status = 400,  description = "Invalid request")
+    ),
+    params(
+        ("advertiser_id" = uuid::Uuid, Path, description = "Advertiser ID"),
+    )
+)]
 pub async fn get_advertiser_by_id(
     State(state): State<AppState>,
     Path(advertiser_id): Path<uuid::Uuid>,
@@ -36,6 +59,16 @@ pub async fn get_advertiser_by_id(
     Ok((StatusCode::OK, Json(advertiser)))
 }
 
+/// Add or update ML score
+#[utoipa::path(
+    post,
+    tag = "Advertisers",
+    path = "/ml_scores",
+    responses(
+        (status = 200, body = ()),
+        (status = 400,  description = "Invalid request")
+    ),
+)]
 pub async fn ml_scores(
     State(state): State<AppState>,
     Json(ml_score): Json<MlScoreForm>,

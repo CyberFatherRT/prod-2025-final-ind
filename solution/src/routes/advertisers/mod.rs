@@ -1,12 +1,12 @@
-mod route;
+pub mod routes;
 
 use crate::AppState;
 use axum::{
     routing::{get, post},
     Router,
 };
-pub use route::ml_scores;
-use route::{bulk, get_advertiser_by_id};
+pub use routes::ml_scores;
+use routes::{bulk, get_advertiser_by_id};
 
 use super::campaigns;
 

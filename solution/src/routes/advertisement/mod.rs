@@ -1,4 +1,4 @@
-mod routes;
+pub mod routes;
 
 use axum::{
     routing::{get, post},

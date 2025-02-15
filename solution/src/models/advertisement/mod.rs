@@ -1,10 +1,11 @@
 use serde::{Deserialize, Serialize};
 use sqlx::{prelude::FromRow, Pool, Postgres};
+use utoipa::ToSchema;
 use uuid::Uuid;
 
 use crate::errors::ProdError;
 
-#[derive(Serialize, Deserialize, FromRow)]
+#[derive(Serialize, Deserialize, FromRow, ToSchema)]
 pub struct AdvertisementModel {
     #[serde(rename = "ad_id")]
     pub campaign_id: Uuid,

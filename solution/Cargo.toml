@@ -27,6 +27,9 @@ thiserror = "2.0.11"
 tokio = { version = "1.43.0", features = ["full"] }
 tracing = "0.1.41"
 tracing-subscriber = { version = "0.3.19", features = ["fmt", "env-filter"] }
+utoipa = { version = "5.3.1", features = ["axum_extras", "non_strict_integers", "uuid"] }
+utoipa-axum = "0.2.0"
+utoipa-swagger-ui = { version = "9.0.0", features = ["axum"] }
 uuid = { version = "1.13.1", features = ["serde", "v4", "v7"] }
 validator = { version = "0.20.0", features = ["derive"] }
 

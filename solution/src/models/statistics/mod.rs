@@ -1,10 +1,11 @@
 use serde::{Deserialize, Serialize};
 use sqlx::PgConnection;
+use utoipa::ToSchema;
 use uuid::Uuid;
 
 use crate::errors::ProdError;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, ToSchema)]
 pub struct StatisticsModel {
     pub impressions_count: i32,
     pub clicks_count: i32,
@@ -14,7 +15,7 @@ pub struct StatisticsModel {
     pub spent_total: f64,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, ToSchema)]
 pub struct DailyStatisticsModel {
     pub impressions_count: i32,
     pub clicks_count: i32,

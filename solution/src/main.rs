@@ -1,7 +1,13 @@
+#[cfg(debug_assertions)]
+use solution::openapi::ApiDoc;
 use solution::{app, services::setup_s3, utils::env, AppState};
 use sqlx::PgPool;
 use tokio::net::TcpListener;
 use tracing::Level;
+#[cfg(debug_assertions)]
+use utoipa::OpenApi;
+#[cfg(debug_assertions)]
+use utoipa_swagger_ui::SwaggerUi;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -24,9 +30,15 @@ async fn main() -> anyhow::Result<()> {
     let s3 = setup_s3().await;
     let app_state = AppState { pool, rclient, s3 };
 
+    let app = app(app_state);
+
+    #[cfg(debug_assertions)]
+    let app = app
+        .merge(SwaggerUi::new("/api/swagger-ui").url("/api-doc/openapi.json", ApiDoc::openapi()));
+
     let addr = format!("0.0.0.0:{}", port);
     let listener = TcpListener::bind(&addr).await?;
-    axum::serve(listener, app(app_state)).await?;
+    axum::serve(listener, app).await?;
 
     Ok(())
 }

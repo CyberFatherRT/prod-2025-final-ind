@@ -2,6 +2,7 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use sqlx::Type;
+use utoipa::ToSchema;
 use validator::Validate;
 
 use crate::models::clients::{ClientGenderModel, ClientModel};
@@ -9,7 +10,7 @@ use crate::models::clients::{ClientGenderModel, ClientModel};
 static RE_CLIENT_LOGIN: Lazy<Regex> =
     Lazy::new(|| Regex::new(r"^[a-zA-Z0-9_]*$").expect("Invalid regex"));
 
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, Type)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, Type, ToSchema)]
 #[sqlx(type_name = "GENDER", rename_all = "UPPERCASE")]
 #[serde(rename_all = "UPPERCASE")]
 pub enum ClientGenderForm {
@@ -17,14 +18,17 @@ pub enum ClientGenderForm {
     Female,
 }
 
-#[derive(Debug, Validate, Serialize, Deserialize, Clone, sqlx::FromRow)]
+#[derive(Debug, Validate, Serialize, Deserialize, Clone, sqlx::FromRow, ToSchema)]
 pub struct ClientForm {
     pub client_id: uuid::Uuid,
+
     #[validate(length(min = 3, max = 150, message = "Login is too short or too long"))]
     #[validate(regex(path = *RE_CLIENT_LOGIN, message = "Login contains invalid characters"))]
     pub login: String,
+
     #[validate(range(min = 0, max = 120, message = "Age is out of range"))]
     pub age: i32,
+
     #[validate(length(min = 3, max = 150, message = "Location is too short or too long"))]
     pub location: String,
     pub gender: ClientGenderForm,
