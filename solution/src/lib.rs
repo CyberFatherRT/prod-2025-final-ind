@@ -36,18 +36,15 @@ pub struct AppState {
 }
 
 pub fn app(state: AppState) -> Router {
-    Router::new().nest(
-        "/api",
-        Router::new()
-            .route("/health", get(StatusCode::OK))
-            .route("/ml-scores", post(advertisers::ml_scores))
-            .nest("/clients", clients::get_routes())
-            .nest("/advertisers", advertisers::get_routes())
-            .nest("/ads", advertisement::get_routes())
-            .nest("/stats", statistics::get_routes())
-            .nest("/time", time::get_routes())
-            .layer(from_fn(change_status_code))
-            .layer(from_fn(log_request))
-            .with_state(state),
-    )
+    Router::new()
+        .route("/health", get(StatusCode::OK))
+        .route("/ml-scores", post(advertisers::ml_scores))
+        .nest("/clients", clients::get_routes())
+        .nest("/advertisers", advertisers::get_routes())
+        .nest("/ads", advertisement::get_routes())
+        .nest("/stats", statistics::get_routes())
+        .nest("/time", time::get_routes())
+        .layer(from_fn(change_status_code))
+        .layer(from_fn(log_request))
+        .with_state(state)
 }

@@ -22,14 +22,14 @@ pub enum ClientGenderForm {
 pub struct ClientForm {
     pub client_id: uuid::Uuid,
 
-    #[validate(length(min = 3, max = 150, message = "Login is too short or too long"))]
+    #[validate(length(min = 1, message = "Login is too short or too long"))]
     #[validate(regex(path = *RE_CLIENT_LOGIN, message = "Login contains invalid characters"))]
     pub login: String,
 
-    #[validate(range(min = 0, max = 120, message = "Age is out of range"))]
+    #[validate(range(min = 0, message = "Age is out of range"))]
     pub age: i32,
 
-    #[validate(length(min = 3, max = 150, message = "Location is too short or too long"))]
+    #[validate(length(min = 1, message = "Location is too short or too long"))]
     pub location: String,
     pub gender: ClientGenderForm,
 }

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            UPDATE campaigns\n            SET cost_per_click = COALESCE($1, cost_per_click),\n                ad_title = COALESCE($2, ad_title),\n                ad_text = COALESCE($3, ad_text),\n                gender = COALESCE($4, gender),\n                age_from = COALESCE($5, age_from),\n                age_to = COALESCE($6, age_to),\n                location = COALESCE($7, location)\n            WHERE advertiser_id = $8 AND id = $9 AND is_deleted = false\n            RETURNING id, advertiser_id, impressions_limit, clicks_limit, cost_per_impression,\n                      cost_per_click, ad_title, ad_text, start_date, end_date,\n                      gender AS \"gender: CampaignGenderModel\",\n                      age_from, age_to, location\n            ",
+  "query": "\n            UPDATE campaigns\n            SET cost_per_click = COALESCE($1, cost_per_click),\n                ad_title = COALESCE($2, ad_title),\n                ad_text = COALESCE($3, ad_text),\n                gender = COALESCE($4, gender),\n                age_from = COALESCE($5, age_from),\n                age_to = COALESCE($6, age_to),\n                location = COALESCE($7, location)\n            WHERE advertiser_id = $8 AND id = $9 AND is_deleted = false\n            RETURNING id, advertiser_id, impressions_limit, clicks_limit, cost_per_impression,\n                      cost_per_click, ad_title, ad_text, start_date, end_date,\n                      gender AS \"gender: CampaignGenderModel\",\n                      age_from, age_to, location, files\n            ",
   "describe": {
     "columns": [
       {
@@ -83,6 +83,11 @@
         "ordinal": 13,
         "name": "location",
         "type_info": "Text"
+      },
+      {
+        "ordinal": 14,
+        "name": "files",
+        "type_info": "TextArray"
       }
     ],
     "parameters": {
@@ -123,8 +128,9 @@
       true,
       true,
       true,
+      true,
       true
     ]
   },
-  "hash": "0cb476abc9eb3ddaa9c848012e268db6e75c07a4744c7c1dc1fcb28293344144"
+  "hash": "19b8dfe0af3b948ad7b5a22447fff0af252b8f40f9d8819e802c1bafc9491dfe"
 }

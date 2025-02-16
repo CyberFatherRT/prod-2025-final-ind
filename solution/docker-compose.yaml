@@ -18,6 +18,11 @@ services:
       - s3
       - db
       - redis
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "8080"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   db:
     image: postgres:17.2-alpine3.21

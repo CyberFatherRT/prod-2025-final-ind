@@ -1,5 +1,9 @@
-use aws_sdk_s3::{config::Credentials, Client};
 use axum::Router;
+use minio::s3::args::BucketExistsArgs;
+use minio::s3::args::MakeBucketArgs;
+use minio::s3::creds::StaticProvider;
+use minio::s3::http::BaseUrl;
+use minio::s3::ClientBuilder;
 use redis::Client as RedisClient;
 use solution::{app, AppState};
 use sqlx::PgPool;
@@ -34,8 +38,9 @@ pub async fn initialize_containers() -> GlobalContainers {
             .with_env_var("POSTGRES_PASSWORD", "password")
             .with_env_var("POSTGRES_DB", "postgres")
             .start()
-            .await?;
-        let port = container.get_host_port_ipv4(5432).await?;
+            .await
+            .unwrap();
+        let port = container.get_host_port_ipv4(5432).await.unwrap();
         info!("Postgres container started on port {}", port);
         Ok((container, port)) as anyhow::Result<_>
     };
@@ -46,8 +51,9 @@ pub async fn initialize_containers() -> GlobalContainers {
             .with_exposed_port(6379.tcp())
             .with_wait_for(WaitFor::message_on_stdout("Ready to accept connections"))
             .start()
-            .await?;
-        let port = container.get_host_port_ipv4(6379).await?;
+            .await
+            .unwrap();
+        let port = container.get_host_port_ipv4(6379).await.unwrap();
         info!("Redis container started on port {}", port);
         Ok((container, port)) as anyhow::Result<_>
     };
@@ -60,8 +66,9 @@ pub async fn initialize_containers() -> GlobalContainers {
             .with_env_var("MINIO_ROOT_USER", "admin")
             .with_env_var("MINIO_ROOT_PASSWORD", "password")
             .start()
-            .await?;
-        let port = container.get_host_port_ipv4(9000).await?;
+            .await
+            .unwrap();
+        let port = container.get_host_port_ipv4(9000).await.unwrap();
         info!("S3 (minio) container started on port {}", port);
         Ok((container, port)) as anyhow::Result<_>
     };
@@ -108,17 +115,33 @@ pub async fn get_app(global: &GlobalContainers) -> Router {
 
     let s3_endpoint = format!("http://localhost:{}", s3_port);
     info!("Connecting to S3 (minio) at {}", s3_endpoint);
-    let credentials = Credentials::new("admin", "password", None, None, "custom");
-    let config = aws_config::from_env()
-        .credentials_provider(credentials)
-        .endpoint_url(s3_endpoint)
-        .region("ru-central-1")
-        .load()
-        .await;
+    let bucket_name = "test";
 
-    let s3 = Client::new(&config);
+    let static_provider = StaticProvider::new("admin", "password", None);
 
-    let state = AppState { pool, rclient, s3 };
+    let client = ClientBuilder::new(s3_endpoint.parse::<BaseUrl>().unwrap())
+        .provider(Some(Box::new(static_provider)))
+        .build()
+        .unwrap();
+
+    let exists = client
+        .bucket_exists(&BucketExistsArgs::new(bucket_name).unwrap())
+        .await
+        .unwrap();
+
+    if !exists {
+        client
+            .make_bucket(&MakeBucketArgs::new(bucket_name).unwrap())
+            .await
+            .unwrap();
+    };
+
+    let state = AppState {
+        pool,
+        rclient,
+        s3: client,
+        bucket_name: bucket_name.to_string(),
+    };
 
     app(state)
 }

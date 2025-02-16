@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE campaigns\n            SET files = $1\n            WHERE advertiser_id = $2 AND id = $3\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "TextArray",
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "4044b86b659a7f07c94f5f9a4a8fa33ae8d79733c9bdf1d7b863300b1914ef54"
+}

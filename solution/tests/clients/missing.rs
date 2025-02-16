@@ -63,7 +63,7 @@ pub async fn bulk(app: Router) -> anyhow::Result<()> {
 
     for body in bodys {
         let request = Request::builder()
-            .uri("/api/clients/bulk")
+            .uri("/clients/bulk")
             .method("POST")
             .header(header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref())
             .body(body.to_string())?;

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT id, advertiser_id, impressions_limit, clicks_limit, cost_per_impression,\n                   cost_per_click, ad_title, ad_text, start_date, end_date,\n                   gender as \"gender: CampaignGenderModel\", age_from, age_to, location\n            FROM campaigns\n            WHERE advertiser_id = $1 AND id = $2 AND is_deleted = false\n            ",
+  "query": "\n            SELECT id, advertiser_id, impressions_limit, clicks_limit, cost_per_impression,\n                   cost_per_click, ad_title, ad_text, start_date, end_date,\n                   gender as \"gender: CampaignGenderModel\", age_from, age_to, location, files\n            FROM campaigns\n            WHERE advertiser_id = $1 AND is_deleted = false\n            ",
   "describe": {
     "columns": [
       {
@@ -83,11 +83,15 @@
         "ordinal": 13,
         "name": "location",
         "type_info": "Text"
+      },
+      {
+        "ordinal": 14,
+        "name": "files",
+        "type_info": "TextArray"
       }
     ],
     "parameters": {
       "Left": [
-        "Uuid",
         "Uuid"
       ]
     },
@@ -105,8 +109,9 @@
       true,
       true,
       true,
+      true,
       true
     ]
   },
-  "hash": "699fb37a544378b6e0055eb763fb3d91a6e01bc01932b6510e2cf1afd76cf4ea"
+  "hash": "e3c8819887b4cc952eb8321a82b8409da1d4590bf46a39564567a29822cc6bd9"
 }

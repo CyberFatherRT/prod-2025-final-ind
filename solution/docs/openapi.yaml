@@ -1,0 +1,895 @@
+openapi: 3.1.0
+info:
+  title: solution
+  description: ''
+  license:
+    name: ''
+  version: 0.1.0
+paths:
+  /ads:
+    get:
+      tags:
+        - Ads
+      summary: Get advertisement for a client
+      operationId: get_ad
+      parameters:
+        - name: client_id
+          in: query
+          description: Client ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdvertisementModel'
+        '404':
+          description: No advertisement found
+  /ads/{campaign_id}/click:
+    post:
+      tags:
+        - Ads
+      summary: Recording a click on an ad
+      operationId: click_ad
+      parameters:
+        - name: campaign_id
+          in: path
+          description: Campaign ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdvertisementForm'
+        required: true
+      responses:
+        '200':
+          description: ''
+        '404':
+          description: No advertisement found or client did not see the ad
+  /advertisers/bulk:
+    post:
+      tags:
+        - Advertisers
+      summary: Bulk insert/update of advertisers
+      operationId: bulk
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/AdvertiserForm'
+        required: true
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AdvertiserModel'
+        '400':
+          description: Invalid request
+  /advertisers/{advertiser_id}:
+    get:
+      tags:
+        - Advertisers
+      summary: Get advertiser by ID
+      operationId: get_advertiser_by_id
+      parameters:
+        - name: advertiser_id
+          in: path
+          description: Advertiser ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdvertiserModel'
+        '400':
+          description: Invalid request
+  /advertisers/{advertiser_id}/campaigns:
+    get:
+      tags:
+        - Campaigns
+      summary: List all advertisement campaigns with pagination
+      operationId: list
+      parameters:
+        - name: advertiser_id
+          in: path
+          description: Advertiser ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: size
+          in: query
+          description: Number of items per page
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+        - name: page
+          in: query
+          description: Page number
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CampaignModel'
+        '400':
+          description: Invalid request
+        '404':
+          description: Campaigns not found
+    post:
+      tags:
+        - Campaigns
+      summary: Create a new advertisement campaign
+      operationId: create
+      parameters:
+        - name: advertiser_id
+          in: path
+          description: Advertiser ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CampaignForm'
+        required: true
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignModel'
+        '400':
+          description: Invalid request
+  /advertisers/{advertiser_id}/campaigns/{campaign_id}:
+    get:
+      tags:
+        - Campaigns
+      summary: Get an advertisement campaign by ID
+      operationId: get_campaign_by_id
+      parameters:
+        - name: advertiser_id
+          in: path
+          description: Advertiser ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: campaign_id
+          in: path
+          description: Campaign ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignModel'
+        '400':
+          description: Invalid request
+        '404':
+          description: Campaign not found
+    put:
+      tags:
+        - Campaigns
+      summary: Update an advertisement campaign by ID
+      operationId: update
+      parameters:
+        - name: advertiser_id
+          in: path
+          description: Advertiser ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: campaign_id
+          in: path
+          description: Campaign ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CampaignPatchForm'
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignModel'
+        '400':
+          description: Invalid request
+        '404':
+          description: Campaign not found
+    delete:
+      tags:
+        - Campaigns
+      summary: Delete an advertisement campaign by ID
+      operationId: delete_campaign
+      parameters:
+        - name: advertiser_id
+          in: path
+          description: Advertiser ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: campaign_id
+          in: path
+          description: Campaign ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: ''
+          content:
+            application/json:
+              schema:
+                default: null
+        '400':
+          description: Invalid request
+        '404':
+          description: Campaign not found
+  /advertisers/{advertiser_id}/campaigns/{campaign_id}/file:
+    post:
+      tags:
+        - Campaigns
+      summary: Add multiple files to a campaign
+      operationId: upload_file
+      parameters:
+        - name: advertiser_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: campaign_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses: {}
+  /advertisers/{advertiser_id}/campaigns/{campaign_id}/file/{file_name}:
+    get:
+      tags:
+        - Campaigns
+      summary: Dowload a file from campaign
+      operationId: download_file
+      parameters:
+        - name: advertiser_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: campaign_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: file_name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses: {}
+    delete:
+      tags:
+        - Campaigns
+      summary: Deletes a file from the campaign
+      operationId: delete_file
+      parameters:
+        - name: advertiser_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: campaign_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: file_name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses: {}
+  /clients/bulk:
+    post:
+      tags:
+        - Clients
+      summary: Bulk insert/update of clients
+      operationId: bulk
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/ClientForm'
+        required: true
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ClientModel'
+        '400':
+          description: Invalid request
+  /clients/{client_id}:
+    get:
+      tags:
+        - Clients
+      summary: Get client by ID
+      operationId: get_client_by_id
+      parameters:
+        - name: client_id
+          in: path
+          description: Client ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientModel'
+        '400':
+          description: Invalid request
+  /ml_scores:
+    post:
+      tags:
+        - Advertisers
+      summary: Add or update ML score
+      operationId: ml_scores
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MlScoreForm'
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                default: null
+        '400':
+          description: Invalid request
+  /stats/advertiser/{advertiser_id}/campaigns:
+    get:
+      tags:
+        - Statistics
+      summary: Get agregated statistics for all campaigns of an advertiser
+      operationId: get_advertiser_statistics
+      parameters:
+        - name: advertiser_id
+          in: path
+          description: Advertiser ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatisticsModel'
+        '404':
+          description: Advertiser not found
+  /stats/advertiser/{advertiser_id}/campaigns/daily:
+    get:
+      tags:
+        - Statistics
+      summary: Get daily statistics for all campaigns of an advertiser
+      operationId: get_advertiser_daily_statistics
+      parameters:
+        - name: advertiser_id
+          in: path
+          description: Advertiser ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DailyStatisticsModel'
+        '404':
+          description: Advertiser not found
+  /stats/campaigns/{campaign_id}:
+    get:
+      tags:
+        - Statistics
+      summary: Get campaign statistics
+      operationId: get_campaign_statistics
+      parameters:
+        - name: campaign_id
+          in: path
+          description: Campaign ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatisticsModel'
+        '404':
+          description: Campaign not found
+  /stats/campaigns/{campaign_id}/daily:
+    get:
+      tags:
+        - Statistics
+      summary: Get daily statistics for a campaign
+      operationId: get_campaign_daily_statistics
+      parameters:
+        - name: campaign_id
+          in: path
+          description: Campaign ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DailyStatisticsModel'
+        '404':
+          description: Campaign not found
+  /time/advance:
+    post:
+      tags:
+        - Time
+      summary: Set the current date
+      operationId: set_date
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeForm'
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeModel'
+components:
+  schemas:
+    AdvertisementForm:
+      type: object
+      required:
+        - client_id
+      properties:
+        client_id:
+          type: string
+          format: uuid
+    AdvertisementModel:
+      type: object
+      required:
+        - ad_id
+        - ad_title
+        - ad_text
+        - advertiser_id
+      properties:
+        ad_id:
+          type: string
+          format: uuid
+        ad_text:
+          type: string
+        ad_title:
+          type: string
+        advertiser_id:
+          type: string
+          format: uuid
+    AdvertiserForm:
+      type: object
+      required:
+        - advertiser_id
+        - name
+      properties:
+        advertiser_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+    AdvertiserModel:
+      type: object
+      required:
+        - advertiser_id
+        - name
+      properties:
+        advertiser_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+    CampaignForm:
+      type: object
+      required:
+        - impressions_limit
+        - clicks_limit
+        - cost_per_impression
+        - cost_per_click
+        - ad_title
+        - ad_text
+        - start_date
+        - end_date
+      properties:
+        ad_text:
+          type: string
+        ad_title:
+          type: string
+        clicks_limit:
+          type: integer
+          format: int32
+        cost_per_click:
+          type: number
+          format: double
+        cost_per_impression:
+          type: number
+          format: double
+        end_date:
+          type: integer
+          format: int32
+        impressions_limit:
+          type: integer
+          format: int32
+        start_date:
+          type: integer
+          format: int32
+        targeting:
+          oneOf:
+            - type: 'null'
+            - $ref: '#/components/schemas/TargetForm'
+    CampaignGenderForm:
+      type: string
+      enum:
+        - MALE
+        - FEMALE
+        - ALL
+    CampaignGenderModel:
+      type: string
+      enum:
+        - MALE
+        - FEMALE
+        - ANY
+    CampaignModel:
+      type: object
+      required:
+        - campaign_id
+        - advertiser_id
+        - impressions_limit
+        - clicks_limit
+        - cost_per_impression
+        - cost_per_click
+        - ad_title
+        - ad_text
+        - start_date
+        - end_date
+        - targeting
+      properties:
+        ad_text:
+          type: string
+        ad_title:
+          type: string
+        advertiser_id:
+          type: string
+          format: uuid
+        campaign_id:
+          type: string
+          format: uuid
+        clicks_limit:
+          type: integer
+          format: int32
+        cost_per_click:
+          type: number
+          format: double
+        cost_per_impression:
+          type: number
+          format: double
+        end_date:
+          type: integer
+          format: int32
+        files:
+          type:
+            - array
+            - 'null'
+          items:
+            type: string
+        impressions_limit:
+          type: integer
+          format: int32
+        start_date:
+          type: integer
+          format: int32
+        targeting:
+          $ref: '#/components/schemas/CampaignTargetModel'
+    CampaignPatchForm:
+      type: object
+      required:
+        - cost_per_click
+        - ad_title
+        - ad_text
+        - targeting
+      properties:
+        ad_text:
+          type: string
+        ad_title:
+          type: string
+        cost_per_click:
+          type: number
+          format: double
+        targeting:
+          $ref: '#/components/schemas/TargetForm'
+    CampaignTargetModel:
+      type: object
+      properties:
+        age_from:
+          type:
+            - integer
+            - 'null'
+          format: int32
+        age_to:
+          type:
+            - integer
+            - 'null'
+          format: int32
+        gender:
+          oneOf:
+            - type: 'null'
+            - $ref: '#/components/schemas/CampaignGenderModel'
+        location:
+          type:
+            - string
+            - 'null'
+    ClientForm:
+      type: object
+      required:
+        - client_id
+        - login
+        - age
+        - location
+        - gender
+      properties:
+        age:
+          type: integer
+          format: int32
+        client_id:
+          type: string
+          format: uuid
+        gender:
+          $ref: '#/components/schemas/ClientGenderForm'
+        location:
+          type: string
+        login:
+          type: string
+    ClientGenderForm:
+      type: string
+      enum:
+        - MALE
+        - FEMALE
+    ClientGenderModel:
+      type: string
+      enum:
+        - MALE
+        - FEMALE
+    ClientModel:
+      type: object
+      required:
+        - client_id
+        - login
+        - age
+        - location
+        - gender
+      properties:
+        age:
+          type: integer
+          format: int32
+        client_id:
+          type: string
+          format: uuid
+        gender:
+          $ref: '#/components/schemas/ClientGenderModel'
+        location:
+          type: string
+        login:
+          type: string
+    DailyStatisticsModel:
+      type: object
+      required:
+        - impressions_count
+        - clicks_count
+        - conversion
+        - spent_impressions
+        - spent_clicks
+        - spent_total
+        - date
+      properties:
+        clicks_count:
+          type: integer
+          format: int32
+        conversion:
+          type: number
+          format: double
+        date:
+          type: integer
+          format: int32
+        impressions_count:
+          type: integer
+          format: int32
+        spent_clicks:
+          type: number
+          format: double
+        spent_impressions:
+          type: number
+          format: double
+        spent_total:
+          type: number
+          format: double
+    MlScoreForm:
+      type: object
+      required:
+        - client_id
+        - advertiser_id
+        - score
+      properties:
+        advertiser_id:
+          type: string
+          format: uuid
+        client_id:
+          type: string
+          format: uuid
+        score:
+          type: integer
+          format: int32
+    StatisticsModel:
+      type: object
+      required:
+        - impressions_count
+        - clicks_count
+        - conversion
+        - spent_impressions
+        - spent_clicks
+        - spent_total
+      properties:
+        clicks_count:
+          type: integer
+          format: int32
+        conversion:
+          type: number
+          format: double
+        impressions_count:
+          type: integer
+          format: int32
+        spent_clicks:
+          type: number
+          format: double
+        spent_impressions:
+          type: number
+          format: double
+        spent_total:
+          type: number
+          format: double
+    TargetForm:
+      type: object
+      properties:
+        age_from:
+          type:
+            - integer
+            - 'null'
+          format: int32
+        age_to:
+          type:
+            - integer
+            - 'null'
+          format: int32
+        gender:
+          oneOf:
+            - type: 'null'
+            - $ref: '#/components/schemas/CampaignGenderForm'
+        location:
+          type:
+            - string
+            - 'null'
+    TimeForm:
+      type: object
+      properties:
+        current_date:
+          type:
+            - integer
+            - 'null'
+          format: u-int8
+          minimum: 0
+    TimeModel:
+      type: object
+      required:
+        - current_date
+      properties:
+        current_date:
+          type: integer
+          format: u-int8
+          minimum: 0
+tags:
+  - name: Clients
+    description: 'Client managing: creation and info updating'
+  - name: Advertisers
+    description: 'Advertiser managing: creation and info updating'
+  - name: Campaigns
+    description: 'Campaign managing: create, update, delete and list campaigns'
+  - name: Ads
+    description: Showing ads to clients and recording clicks
+  - name: Statistics
+    description: Get statistics for campaigns and advertisers, daily and aggregated
+  - name: Time
+    description: Manage time for the system

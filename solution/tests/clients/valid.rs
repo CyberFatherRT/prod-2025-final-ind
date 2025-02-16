@@ -27,7 +27,7 @@ pub async fn bulk(app: Router) -> anyhow::Result<()> {
     ]);
 
     let request = Request::builder()
-        .uri("/api/clients/bulk")
+        .uri("/clients/bulk")
         .method("POST")
         .header(header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref())
         .body(request_body.to_string())?;
@@ -41,7 +41,7 @@ pub async fn bulk(app: Router) -> anyhow::Result<()> {
     assert_eq!(response_body, request_body);
 
     let request = Request::builder()
-        .uri("/api/clients/bulk")
+        .uri("/clients/bulk")
         .method("POST")
         .header(header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref())
         .body(json!([]).to_string())?;
@@ -64,7 +64,7 @@ pub async fn bulk(app: Router) -> anyhow::Result<()> {
     ]);
 
     let request = Request::builder()
-        .uri("/api/clients/bulk")
+        .uri("/clients/bulk")
         .method("POST")
         .header(header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref())
         .body(request_body.to_string())?;
@@ -94,7 +94,7 @@ pub async fn get(app: Router) -> anyhow::Result<()> {
     ]);
 
     let request = Request::builder()
-        .uri("/api/clients/bulk")
+        .uri("/clients/bulk")
         .method("POST")
         .header(header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref())
         .body(request_body.to_string())?;
@@ -108,7 +108,7 @@ pub async fn get(app: Router) -> anyhow::Result<()> {
     assert_eq!(response_body, request_body);
 
     let request = Request::builder()
-        .uri("/api/clients/8b064e99-6e04-4db9-9b94-1d182e318042")
+        .uri("/clients/8b064e99-6e04-4db9-9b94-1d182e318042")
         .method("GET")
         .body("".to_string())?;
 
