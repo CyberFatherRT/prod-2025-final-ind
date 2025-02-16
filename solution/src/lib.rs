@@ -31,7 +31,8 @@ pub mod utils;
 pub struct AppState {
     pub pool: PgPool,
     pub rclient: redis::Client,
-    pub s3: aws_sdk_s3::Client,
+    pub s3: minio::s3::Client,
+    pub bucket_name: String,
 }
 
 pub fn app(state: AppState) -> Router {

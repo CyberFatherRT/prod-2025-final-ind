@@ -1,4 +1,5 @@
 use axum::{http::StatusCode, response::IntoResponse, Json};
+use tracing::info;
 
 #[derive(thiserror::Error, Debug)]
 pub enum ProdError {
@@ -47,6 +48,8 @@ impl IntoResponse for ProdError {
             Self::Conflict(_) => (StatusCode::CONFLICT, self.to_string()),
             Self::NotFound(_) => (StatusCode::NOT_FOUND, self.to_string()),
         };
+
+        info!("returning error: {}", message);
 
         (status, Json(serde_json::json!({ "error": message }))).into_response()
     }

@@ -14,5 +14,5 @@ pub fn get_routes() -> Router<AppState> {
     Router::new()
         .route("/bulk", post(bulk))
         .route("/{advertiser_id}", get(get_advertiser_by_id))
-        .nest("/{adveriser_id}/", campaigns::get_routes())
+        .nest("/{adveriser_id}/campaigns", campaigns::get_routes())
 }

@@ -8,6 +8,7 @@ use crate::routes::{
         __path_update,
     },
     clients::routes::{__path_bulk, __path_get_client_by_id},
+    minio_s3::routes::{__path_delete_file, __path_download_file, __path_upload_file},
     statistics::routes::{
         __path_get_advertiser_daily_statistics, __path_get_advertiser_statistics,
         __path_get_campaign_daily_statistics, __path_get_campaign_statistics,
@@ -20,6 +21,7 @@ use utoipa::OpenApi;
 #[openapi(
     paths(
         get_client_by_id, bulk,
+        upload_file, download_file, delete_file,
         create, list, get_campaign_by_id, update, delete_campaign,
         click_ad, get_ad,
         advertiser_bulk, get_advertiser_by_id, ml_scores,

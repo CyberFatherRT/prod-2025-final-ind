@@ -42,6 +42,8 @@ pub struct CampaignModel {
     pub start_date: i32,
     pub end_date: i32,
     pub targeting: CampaignTargetModel,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub files: Option<Vec<String>>,
 }
 
 #[derive(Clone, Debug, FromRow)]
@@ -60,6 +62,7 @@ pub struct CampaignRow {
     pub age_from: Option<i32>,
     pub age_to: Option<i32>,
     pub location: Option<String>,
+    pub files: Option<Vec<String>>,
 }
 
 impl From<CampaignRow> for CampaignModel {
@@ -75,6 +78,7 @@ impl From<CampaignRow> for CampaignModel {
             ad_text: row.ad_text,
             start_date: row.start_date,
             end_date: row.end_date,
+            files: row.files,
             targeting: CampaignTargetModel {
                 gender: row.gender,
                 age_from: row.age_from,
@@ -115,5 +119,25 @@ pub trait CampaignController {
         conn: &mut PgConnection,
         advertiser_id: Uuid,
         campaign_id: Uuid,
+    ) -> Result<(), ProdError>;
+
+    async fn add_files(
+        conn: &mut PgConnection,
+        advertiser_id: Uuid,
+        campaign_id: Uuid,
+        files: Vec<String>,
+    ) -> Result<(), ProdError>;
+
+    async fn get_files(
+        conn: &mut PgConnection,
+        advertiser_id: Uuid,
+        campaign_id: Uuid,
+    ) -> Result<Vec<String>, ProdError>;
+
+    async fn delete_file(
+        conn: &mut PgConnection,
+        advertiser_id: Uuid,
+        campaign_id: Uuid,
+        file_name: &str,
     ) -> Result<(), ProdError>;
 }

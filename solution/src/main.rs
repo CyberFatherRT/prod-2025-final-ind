@@ -1,6 +1,6 @@
 #[cfg(debug_assertions)]
 use solution::openapi::ApiDoc;
-use solution::{app, services::setup_s3, utils::env, AppState};
+use solution::{app, services::s3::setup_s3, utils::env, AppState};
 use sqlx::PgPool;
 use tokio::net::TcpListener;
 use tracing::Level;
@@ -27,8 +27,13 @@ async fn main() -> anyhow::Result<()> {
     sqlx::migrate!("./migrations").run(&pool).await?;
 
     let rclient = redis::Client::open(redis_url)?;
-    let s3 = setup_s3().await;
-    let app_state = AppState { pool, rclient, s3 };
+    let (s3, bucket_name) = setup_s3().await?;
+    let app_state = AppState {
+        pool,
+        rclient,
+        s3,
+        bucket_name,
+    };
 
     let app = app(app_state);
 

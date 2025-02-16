@@ -25,7 +25,7 @@ impl CampaignController for CampaignModel {
             RETURNING id, advertiser_id, impressions_limit, clicks_limit, cost_per_impression,
                       cost_per_click, ad_title, ad_text, start_date, end_date,
                       gender AS "gender: CampaignGenderModel",
-                      age_from, age_to, location
+                      age_from, age_to, location, files
             "#,
             advertiser_id,
             campaign.impressions_limit,
@@ -63,7 +63,7 @@ impl CampaignController for CampaignModel {
             r#"
             SELECT id, advertiser_id, impressions_limit, clicks_limit, cost_per_impression,
                    cost_per_click, ad_title, ad_text, start_date, end_date,
-                   gender as "gender: CampaignGenderModel", age_from, age_to, location
+                   gender as "gender: CampaignGenderModel", age_from, age_to, location, files
             FROM campaigns
             WHERE advertiser_id = $1 AND is_deleted = false
             "#,
@@ -115,7 +115,7 @@ impl CampaignController for CampaignModel {
             RETURNING id, advertiser_id, impressions_limit, clicks_limit, cost_per_impression,
                       cost_per_click, ad_title, ad_text, start_date, end_date,
                       gender AS "gender: CampaignGenderModel",
-                      age_from, age_to, location
+                      age_from, age_to, location, files
             "#,
             cost_per_click,
             ad_title,
@@ -149,7 +149,7 @@ impl CampaignController for CampaignModel {
             r#"
             SELECT id, advertiser_id, impressions_limit, clicks_limit, cost_per_impression,
                    cost_per_click, ad_title, ad_text, start_date, end_date,
-                   gender as "gender: CampaignGenderModel", age_from, age_to, location
+                   gender as "gender: CampaignGenderModel", age_from, age_to, location, files
             FROM campaigns
             WHERE advertiser_id = $1 AND id = $2 AND is_deleted = false
             "#,
@@ -189,6 +189,92 @@ impl CampaignController for CampaignModel {
         if rows_affected.rows_affected() == 0 {
             return Err(ProdError::NotFound(format!(
                 "No campaign was found with id - `{campaign_id:?}` for advertiser - `{advertiser_id:?}`",
+            )));
+        }
+
+        Ok(())
+    }
+
+    async fn add_files(
+        conn: &mut PgConnection,
+        advertiser_id: Uuid,
+        campaign_id: Uuid,
+        files: Vec<String>,
+    ) -> Result<(), ProdError> {
+        let rows_affected = sqlx::query!(
+            r#"
+            UPDATE campaigns
+            SET files = $1
+            WHERE advertiser_id = $2 AND id = $3
+            "#,
+            &files,
+            advertiser_id,
+            campaign_id
+        )
+        .execute(&mut *conn)
+        .await
+        .map_err(ProdError::DatabaseError)?;
+
+        if rows_affected.rows_affected() == 0 {
+            return Err(ProdError::NotFound(format!(
+                "No campaign was found with id - `{campaign_id:?}` for advertiser - `{advertiser_id:?}`",
+            )));
+        }
+
+        Ok(())
+    }
+
+    async fn get_files(
+        conn: &mut PgConnection,
+        advertiser_id: Uuid,
+        campaign_id: Uuid,
+    ) -> Result<Vec<String>, ProdError> {
+        let files = sqlx::query!(
+            r#"
+            SELECT files
+            FROM campaigns
+            WHERE advertiser_id = $1 AND id = $2
+            "#,
+            advertiser_id,
+            campaign_id
+        )
+        .fetch_one(&mut *conn)
+        .await
+        .map_err(|err| match err {
+            sqlx::Error::RowNotFound => ProdError::NotFound(format!(
+                "No campaign was found with id - `{campaign_id:?}` for advertiser - `{advertiser_id:?}`",
+            )),
+            _ => ProdError::DatabaseError(err),
+        })?
+        .files
+        .unwrap_or_default();
+
+        Ok(files)
+    }
+
+    async fn delete_file(
+        conn: &mut PgConnection,
+        advertiser_id: Uuid,
+        campaign_id: Uuid,
+        file_name: &str,
+    ) -> Result<(), ProdError> {
+        let rows_affected = sqlx::query!(
+            r#"
+            UPDATE campaigns
+            SET files = array_remove(files, $1)
+            WHERE advertiser_id = $2 AND id = $3
+            "#,
+            file_name,
+            advertiser_id,
+            campaign_id
+        )
+        .execute(&mut *conn)
+        .await
+        .map_err(ProdError::DatabaseError)?;
+
+        if rows_affected.rows_affected() == 0 {
+            return Err(ProdError::NotFound(format!(
+                "No file was found with name - `{file_name}` for campaign - `{campaign_id:?}`",
             )));
         }
 
