@@ -29,7 +29,7 @@ pub async fn setup_s3() -> anyhow::Result<(Client, String)> {
         client
             .make_bucket(&MakeBucketArgs::new(&bucket_name)?)
             .await?;
-    };
+    }
 
     Ok((client, bucket_name))
 }

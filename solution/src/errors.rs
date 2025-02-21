@@ -15,7 +15,7 @@ pub enum ProdError {
     DatabaseError(#[from] sqlx::Error),
 
     /// An error occured when connection to or using the redis.
-    #[error("redis error")]
+    #[error("{0}")]
     RedisError(#[from] redis::RedisError),
 
     /// Not found error

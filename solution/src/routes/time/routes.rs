@@ -19,10 +19,12 @@ pub async fn set_date(
     Json(date): Json<TimeForm>,
 ) -> Result<Json<TimeModel>, ProdError> {
     let mut rclient = state.rclient.conn().await?;
-    let current_date = rclient
-        .set("date", date.current_date.unwrap_or(0))
+    rclient
+        .set::<_, _, ()>("date", date.current_date.unwrap_or(0))
         .await
         .map_err(ProdError::RedisError)?;
+
+    let current_date = rclient.get("date").await.map_err(ProdError::RedisError)?;
 
     Ok(Json(TimeModel { current_date }))
 }
