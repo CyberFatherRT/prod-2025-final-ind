@@ -11,7 +11,7 @@ pub enum ProdError {
     AlreadyExists(String),
 
     /// An error occured when connection to or using the database.
-    #[error("database error")]
+    #[error("{0}")]
     DatabaseError(#[from] sqlx::Error),
 
     /// An error occured when connection to or using the redis.
